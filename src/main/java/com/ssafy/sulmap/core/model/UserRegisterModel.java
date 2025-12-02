@@ -13,7 +13,7 @@ public class UserRegisterModel {
     String name;
     String phone;
     String email;
-    Date birthday;
+    Date birth;
     String address;
     String gender;
 }
