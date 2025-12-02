@@ -42,7 +42,7 @@ CREATE TABLE users (
                        INDEX idx_users_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE BARS(
+CREATE TABLE bars(
                      id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
