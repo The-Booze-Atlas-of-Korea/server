@@ -42,6 +42,9 @@ CREATE TABLE users (
                        INDEX idx_users_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE BARS(
+                     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 3) VISITS
 --  bar_id 는 BARS.id 를 FK로 가정 (BARS 테이블은 다른 도메인에서 생성)
