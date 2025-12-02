@@ -4,8 +4,6 @@ import com.ssafy.sulmap.core.command.CreatUserCommand;
 import com.ssafy.sulmap.core.command.UpdateUserCommand;
 import com.ssafy.sulmap.core.query.FindUserResult;
 
-import java.util.List;
-
 public interface UserRepository {
     /// 유저 생성
     /// @return 만들어진 user id
