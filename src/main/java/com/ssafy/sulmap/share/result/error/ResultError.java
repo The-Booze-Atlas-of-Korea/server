@@ -5,7 +5,7 @@ import java.util.Optional;
 
 public interface ResultError {
     /** 에러 코드 (e.g. VALIDATION_ERROR, NOT_FOUND …) */
-    String getCode();
+    int getCode();
 
     /** 사용자/로그용 메시지 */
     String getMessage();
@@ -14,7 +14,7 @@ public interface ResultError {
     Map<String, Object> getMetadata();
 
     /** 원인이 되는 예외가 있으면 넣어도 됨 */
-    default Optional<Throwable> getCause() {
-        return Optional.empty();
+    default Throwable getCause() {
+        return null;
     }
 }
