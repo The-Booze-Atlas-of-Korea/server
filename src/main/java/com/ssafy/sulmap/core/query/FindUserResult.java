@@ -15,7 +15,7 @@ public class FindUserResult {
     String email;
     String phone;
     String address;
-    String birthday;
+    Date birthday;
     String gender;
     String profileImageUrl;
     String status;

@@ -3,6 +3,8 @@ package com.ssafy.sulmap.core.command;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 @Builder
 public class UpdateUserCommand {
@@ -10,6 +12,6 @@ public class UpdateUserCommand {
     String email;
     String phone;
     String address;
-    String birthday;
+    Date birthday;
     String gender;
 }
