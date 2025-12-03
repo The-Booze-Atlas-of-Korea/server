@@ -22,11 +22,18 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private boolean userExist(long userId){
+        var findResult = userRepository.findById(userId);
+        return findResult != null && findResult.getDeletedAt() == null;
+    }
+    private boolean userExist(String userLoginId){
+        var findResult = userRepository.findByLoginId(userLoginId);
+        return findResult != null && findResult.getDeletedAt() == null;
+    }
+
     @Override
     public Result<Long> registerUser(UserModel userModel) {
-        //id 중복체크
-        var findResult = userRepository.findByLoginId(userModel.getLoginId());
-        if(findResult != null && findResult.getDeletedAt() == null) {
+        if(userExist(userModel.getLoginId())) {
             return Result.fail(new ConflictError("이미 존재하는 로그인 아이디"));
         }
 
@@ -51,9 +58,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result<Long> updateUser(long userId, UserUpdateModel userUpdateModel) {
-        //id 존재 여부 체크
-        var findResult = userRepository.findById(userId);
-        if(findResult == null || findResult.getDeletedAt() != null) {
+        if(!userExist(userId)) {
             return Result.fail(new NotFoundError("userId", userId));
         }
 
@@ -77,8 +82,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Result deleteUser(long userId) {
         //id 존재 여부 체크
-        var findResult = userRepository.findById(userId);
-        if(findResult == null || findResult.getDeletedAt() != null) {
+        if(!userExist(userId)) {
             return Result.fail(new NotFoundError("userId", userId));
         }
 
@@ -89,6 +93,7 @@ public class UserServiceImpl implements UserService {
 
         return Result.ok();
     }
+
 
     @Override
     public Result<Long> updateUserDrinkHistory(long userId, MemberDrinkHistoryOpen historyOpen) {
