@@ -55,8 +55,9 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public FindUserResult findByLoginId(long id) {
-        return null;
+    public FindUserResult findByLoginId(String loginId) {
+        UserEntity entity = userMapper.selectByLoginId(loginId);
+        return toResult(entity);
     }
     private UserEntity toEntity(CreatUserCommand command) {
         Date now = new Date();
