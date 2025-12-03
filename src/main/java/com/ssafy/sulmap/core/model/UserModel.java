@@ -1,15 +1,16 @@
 package com.ssafy.sulmap.core.model;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.Date;
 
 @Getter
 @Builder
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserModel {
-    String id;
+    String loginId;
     String password;
     String name;
     String phone;

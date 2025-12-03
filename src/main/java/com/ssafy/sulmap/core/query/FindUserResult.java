@@ -1,13 +1,17 @@
 package com.ssafy.sulmap.core.query;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.jdbc.repository.query.Query;
 
 import java.util.Date;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class FindUserResult {
     String loginId;
     String passwordHash;
