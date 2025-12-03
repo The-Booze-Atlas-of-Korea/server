@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
     public Result<Long> registerUser(UserModel userModel) {
         //id 중복체크
         var findResult = userRepository.findByLoginId(userModel.getLoginId());
-        if(findResult != null) {
+        if(findResult != null && findResult.getDeletedAt() == null) {
             return Result.fail(new ConflictError("이미 존재하는 로그인 아이디"));
         }
 
@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
     public Result<Long> updateUser(long userId, UserUpdateModel userUpdateModel) {
         //id 존재 여부 체크
         var findResult = userRepository.findById(userId);
-        if(findResult == null) {
+        if(findResult == null || findResult.getDeletedAt() != null) {
             return Result.fail(new NotFoundError("userId", userId));
         }
 
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService {
     public Result deleteUser(long userId) {
         //id 존재 여부 체크
         var findResult = userRepository.findById(userId);
-        if(findResult == null) {
+        if(findResult == null || findResult.getDeletedAt() != null) {
             return Result.fail(new NotFoundError("userId", userId));
         }
 
