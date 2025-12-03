@@ -1,6 +1,7 @@
 package com.ssafy.sulmap.core.service.impl;
 
 import com.ssafy.sulmap.core.command.CreateUserCommand;
+import com.ssafy.sulmap.core.command.UpdateUserCommand;
 import com.ssafy.sulmap.core.model.MemberDrinkHistoryOpen;
 import com.ssafy.sulmap.core.model.UserModel;
 import com.ssafy.sulmap.core.model.UserUpdateModel;
@@ -8,6 +9,7 @@ import com.ssafy.sulmap.core.repository.UserRepository;
 import com.ssafy.sulmap.core.service.UserService;
 import com.ssafy.sulmap.share.result.Result;
 import com.ssafy.sulmap.share.result.error.impl.ConflictError;
+import com.ssafy.sulmap.share.result.error.impl.NotFoundError;
 import com.ssafy.sulmap.share.result.error.impl.ServerError;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,7 +51,27 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result<Long> updateUser(long userId, UserUpdateModel userUpdateModel) {
-        return null;
+        //id 존재 여부 체크
+        var findResult = userRepository.findById(userId);
+        if(findResult == null) {
+            return Result.fail(new NotFoundError("userId", userId));
+        }
+
+        var userUpdateCommand = UpdateUserCommand.builder()
+                .name(userUpdateModel.getName())
+                .phone(userUpdateModel.getPhone())
+                .email(userUpdateModel.getEmail())
+                .birthday(userUpdateModel.getBirth())
+                .address(userUpdateModel.getAddress())
+                .gender(userUpdateModel.getGender())
+                .build();
+
+        var updateResult = userRepository.update(userUpdateCommand);
+        if(updateResult == null) {
+            return Result.fail(new ServerError("userRepository.update 실패", userUpdateCommand));
+        }
+
+        return Result.ok(updateResult);
     }
 
     @Override
