@@ -113,7 +113,32 @@ class UserServiceImplTest {
         assertInstanceOf(NotFoundError.class, result.getErrors().get(0), "에러는 NotFoundError 이어야 한다.");
     }
 
+    /// FR7	사용자는 언제든지 계정을 탈퇴(삭제)할 수 있어야 하며, 관련 정책에 따라 데이터가 익명화 또는 삭제 처리되어야 한다.<br/>
+    /// NotFoundError 찾을수 없는 아이디<br/>
+    // Result deleteUser(long userId);
+    // 유저 삭제 성공
+    @Test
+    void deleteUser_success() {
+        var userId = _fixtureMonkey.giveMeOne(Long.class);
 
+        when(userRepository.findById(userId)).thenReturn(FindUserResult.builder().build());
+        when(userRepository.delete(userId)).thenReturn(Boolean.TRUE);
 
-    // ===================== 헬퍼 메서드 =====================
+        var result = userService.deleteUser(userId);
+        assertTrue(result.isSuccess(), "성공");
+    }
+
+    @Test
+    void deleteUser_NotFoundUserId_returnsNotFoundError() {
+        var userId = _fixtureMonkey.giveMeOne(Long.class);
+
+        when(userRepository.findById(userId)).thenReturn(null);
+
+        var result = userService.deleteUser(userId);
+
+        assertTrue(result.isFailure(), "실패");
+        assertNotNull(result.getErrors());
+        assertFalse(result.getErrors().isEmpty(), "에러 리스트가 있어야 한다.");
+        assertInstanceOf(NotFoundError.class, result.getErrors().get(0), "에러는 NotFoundError 이어야 한다.");
+    }
 }

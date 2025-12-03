@@ -76,7 +76,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result deleteUser(long userId) {
-        return null;
+        //id 존재 여부 체크
+        var findResult = userRepository.findById(userId);
+        if(findResult == null) {
+            return Result.fail(new NotFoundError("userId", userId));
+        }
+
+        var deleteResult = userRepository.delete(userId);
+        if(!deleteResult) {
+            return Result.fail(new ServerError("userRepository.delete 실패", userId));
+        }
+
+        return Result.ok();
     }
 
     @Override
