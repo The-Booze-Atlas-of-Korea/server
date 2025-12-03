@@ -17,4 +17,7 @@ public interface UserRepository {
     /// 유저 찾기
     /// @return FindUserResult
     FindUserResult findById(long id);
+    /// loginid로 유저찾기
+    /// @return FindUserResult
+    FindUserResult findByLoginId(long id);
 }
