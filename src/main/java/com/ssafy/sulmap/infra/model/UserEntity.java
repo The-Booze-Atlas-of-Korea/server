@@ -21,10 +21,12 @@ public class UserEntity {
     private Date birthday;
     private String gender;
     private String profileImageUrl;
+    private String authProvider;
+    private String providerId;
     private String status;
-    private boolean visitVisibility; //공개여부
+    private String visitVisibilitySetting; //공개여부
     private Date createdAt;
     private Date updatedAt;
     private Date deletedAt;
-    private Date lastLogin;
+    private Date lastLoginAt;
 }
