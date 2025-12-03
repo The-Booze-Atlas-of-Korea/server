@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.sulmap.infra.mapper.UserMapper">
+
+    <resultMap id="UserResultMap" type="com.ssafy.sulmap.infra.model.UserEntity">
+        <id property="id" column="id"/>
+        <result property="loginId" column="login_id"/>
+        <result property="passwordHash" column="password_hash"/>
+        <result property="name" column="name"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
+        <result property="address" column="address"/>
+        <result property="birthDate" column="birth_date"/>
+        <result property="gender" column="gender"/>
+        <result property="profileImageUrl" column="profile_image_url"/>
+        <result property="authProvider" column="auth_provider"/>
+        <result property="providerId" column="provider_id"/>
+        <result property="status" column="status"/>
+        <result property="visitVisibilitySetting" column="visit_visibility_setting"/>
+        <result property="lastLoginAt" column="last_login_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="deletedAt" column="deleted_at"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, login_id, password_hash, name, phone, email, birth_date, address, gender, profile_image_url,
+        auth_provider, provider_id, status, visit_visibility_setting, last_login_at, created_at, updated_at, deleted_at
+    </sql>
+
+    <select id="selectById" parameterType="long" resultMap="UserResultMap">
+        SELECT
+        <include refid="BaseColumns"/>
+        FROM users
+        WHERE id = #{id}
+        AND deleted_at IS NULL
+    </select>
+
+    <select id="selectByLoginId" parameterType="string" resultMap="UserResultMap">
+        SELECT
+        <include refid="BaseColumns"/>
+        FROM users
+        WHERE login_id = #{loginId}
+        AND deleted_at IS NULL
+    </select>
+
+    <insert id="insert" parameterType="com.ssafy.sulmap.infra.model.UserEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO users (login_id, password_hash, name, phone, email, birth_date, address, gender,
+                           profile_image_url, auth_provider, provider_id, status, visit_visibility_setting,
+                           last_login_at, created_at, updated_at, deleted_at)
+        VALUES (#{loginId}, #{passwordHash}, #{name}, #{phone}, #{email}, #{birthDate}, #{address}, #{gender},
+                #{profileImageUrl}, #{authProvider}, #{providerId}, #{status}, #{visitVisibilitySetting},
+                #{lastLoginAt}, #{createdAt}, #{updatedAt}, #{deletedAt})
+    </insert>
+
+    <update id="update" parameterType="com.ssafy.sulmap.infra.model.UserEntity">
+        UPDATE users
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="birthDate != null">birth_date = #{birthDate},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="profileImageUrl != null">profile_image_url = #{profileImageUrl},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="visitVisibilitySetting != null">visit_visibility_setting = #{visitVisibilitySetting},</if>
+            <if test="passwordHash != null">password_hash = #{passwordHash},</if>
+            updated_at = NOW()
+        </set>
+        WHERE id = #{id}
+        AND deleted_at IS NULL
+    </update>
+
+    <update id="updateLastLoginAt">
+        UPDATE users
+        SET last_login_at = #{lastLoginAt},
+            updated_at = NOW()
+        WHERE id = #{id}
+          AND deleted_at IS NULL
+    </update>
+
+    <update id="softDelete" parameterType="long">
+        UPDATE users
+        SET deleted_at = NOW(),
+            updated_at = NOW()
+        WHERE id = #{id}
+          AND deleted_at IS NULL
+    </update>
+
+    <select id="existsByLoginId" parameterType="string" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1 FROM users WHERE login_id = #{loginId} AND deleted_at IS NULL
+        )
+    </select>
+</mapper>

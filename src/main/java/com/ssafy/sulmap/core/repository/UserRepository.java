@@ -7,7 +7,7 @@ import com.ssafy.sulmap.core.query.FindUserResult;
 public interface UserRepository {
     /// 유저 생성
     /// @return 만들어진 user id
-    Long create(CreatUserCommand creatUserCommand);
+    Long create(CreatUserCommand createUserCommand);
     /// 유저 업데이트
     /// @return 업데이트 된 user id
     Long update(UpdateUserCommand updateUserCommand);
