@@ -8,6 +8,7 @@ import java.util.Date;
 @Data
 @Builder
 public class UpdateUserCommand {
+    Long id;
     String name;
     String email;
     String phone;
