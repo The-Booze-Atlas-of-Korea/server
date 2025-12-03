@@ -97,7 +97,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result<Long> updateUserDrinkHistory(long userId, MemberDrinkHistoryOpen historyOpen) {
-        return null;
+        if(!userExist(userId)) {
+            return Result.fail(new NotFoundError("userId", userId));
+        }
+
+        var updateResult = userRepository.updateDrinkHistoryVisibility(userId, historyOpen);
+        if(updateResult == null) {
+            return Result.fail(new ServerError("userRepository.updateDrinkHistoryVisibility 실패", userId));
+        }
+
+        return Result.ok(updateResult);
     }
 
     @Override

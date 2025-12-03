@@ -3,6 +3,7 @@ package com.ssafy.sulmap.core.service.impl;
 import com.navercorp.fixturemonkey.FixtureMonkey;
 import com.ssafy.sulmap.core.command.CreateUserCommand;
 import com.ssafy.sulmap.core.command.UpdateUserCommand;
+import com.ssafy.sulmap.core.model.MemberDrinkHistoryOpen;
 import com.ssafy.sulmap.core.model.UserModel;
 import com.ssafy.sulmap.core.model.UserUpdateModel;
 import com.ssafy.sulmap.core.query.FindUserResult;
@@ -135,6 +136,42 @@ class UserServiceImplTest {
         when(userRepository.findById(userId)).thenReturn(null);
 
         var result = userService.deleteUser(userId);
+
+        assertTrue(result.isFailure(), "실패");
+        assertNotNull(result.getErrors());
+        assertFalse(result.getErrors().isEmpty(), "에러 리스트가 있어야 한다.");
+        assertInstanceOf(NotFoundError.class, result.getErrors().get(0), "에러는 NotFoundError 이어야 한다.");
+    }
+
+    /// FR19 사용자는 자신의 술자리 이력·방문 기록의 공개 범위(전체 공개 / 친구만 / 비공개)를 설정할 수 있어야 한다.<br/>
+    /// NotFoundError 찾을수 없는 아이디<br/>
+    /// {@return UserID}
+    //Result<Long> updateUserDrinkHistory(long userId, MemberDrinkHistoryOpen historyOpen);
+    //업데이트 성공
+    // 유저 업데이트 성공
+    @Test
+    void updateUserDrinkHistory_success() {
+        var memberDrinkHistoryOpen = _fixtureMonkey.giveMeOne(MemberDrinkHistoryOpen.class);
+        var userId = 1L;
+
+        when(userRepository.findById(userId)).thenReturn(FindUserResult.builder().build());
+        when(userRepository.updateDrinkHistoryVisibility(userId, memberDrinkHistoryOpen)).thenReturn(1L);
+
+        var result =  userService.updateUserDrinkHistory(userId, memberDrinkHistoryOpen);
+
+        assertTrue(result.isSuccess(), "성공");
+        assertEquals(1L, result.getValue().orElseThrow());
+    }
+
+    // 유저 업데이트 성공
+    @Test
+    void updateUserDrinkHistory_NotFoundUserId_returnsNotFoundError() {
+        var memberDrinkHistoryOpen = _fixtureMonkey.giveMeOne(MemberDrinkHistoryOpen.class);
+        var userId = 1L;
+
+        when(userRepository.findById(userId)).thenReturn(null);
+
+        var result =  userService.updateUserDrinkHistory(userId, memberDrinkHistoryOpen);
 
         assertTrue(result.isFailure(), "실패");
         assertNotNull(result.getErrors());
