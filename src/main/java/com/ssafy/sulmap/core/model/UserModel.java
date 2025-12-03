@@ -1,14 +1,12 @@
 package com.ssafy.sulmap.core.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 
 @Getter
 @Builder
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserModel {

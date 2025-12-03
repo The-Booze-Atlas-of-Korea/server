@@ -112,6 +112,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result<UserModel> findUserById(String userId) {
-        return null;
+        var findResult = userRepository.findByLoginId(userId);
+        if(findResult == null){
+            return  Result.fail(new NotFoundError("userId", userId));
+        }
+
+        UserModel modleResult = UserModel.builder()
+                .loginId(findResult.getLoginId())
+                .password(findResult.getPasswordHash())
+                .name(findResult.getName())
+                .phone(findResult.getPhone())
+                .email(findResult.getEmail())
+                .birth(findResult.getBirthday())
+                .address(findResult.getAddress())
+                .gender(findResult.getGender())
+                .profile_image_url(findResult.getProfileImageUrl())
+                .build();
+
+        return Result.ok(modleResult);
     }
 }

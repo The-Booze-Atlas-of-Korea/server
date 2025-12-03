@@ -163,7 +163,7 @@ class UserServiceImplTest {
         assertEquals(1L, result.getValue().orElseThrow());
     }
 
-    // 유저 업데이트 성공
+    // 유저 업데이트 실패 -> 유저 id 찾을수 없음
     @Test
     void updateUserDrinkHistory_NotFoundUserId_returnsNotFoundError() {
         var memberDrinkHistoryOpen = _fixtureMonkey.giveMeOne(MemberDrinkHistoryOpen.class);
@@ -178,4 +178,50 @@ class UserServiceImplTest {
         assertFalse(result.getErrors().isEmpty(), "에러 리스트가 있어야 한다.");
         assertInstanceOf(NotFoundError.class, result.getErrors().get(0), "에러는 NotFoundError 이어야 한다.");
     }
+
+    /// NotFoundError 찾을수 없는 아이디<br/>
+    /// {@return UserModel}
+    //Result<UserModel> findUserById(String userId);
+    //유저 찾기 성공
+    @Test
+    void findUserById_success() {
+        var userId = _fixtureMonkey.giveMeOne(String.class);
+        var findResult = _fixtureMonkey.giveMeOne(FindUserResult.class);
+
+        when(userRepository.findByLoginId(userId)).thenReturn(findResult);
+
+        var result = userService.findUserById(userId);
+
+        UserModel modelResult = UserModel.builder()
+                .loginId(findResult.getLoginId())
+                .password(findResult.getPasswordHash())
+                .name(findResult.getName())
+                .phone(findResult.getPhone())
+                .email(findResult.getEmail())
+                .birth(findResult.getBirthday())
+                .address(findResult.getAddress())
+                .gender(findResult.getGender())
+                .profile_image_url(findResult.getProfileImageUrl())
+                .build();
+
+        assertTrue(result.isSuccess(), "성공");
+        assertEquals(modelResult.toString(), result.getValue().orElseThrow().toString());
+    }
+
+    //유저 찾기 실패 -> id를 찾을수 없음
+    @Test
+    void findUserById_NotFoundUserId_returnsNotFoundError() {
+        var userId = _fixtureMonkey.giveMeOne(String.class);
+
+        when(userRepository.findByLoginId(userId)).thenReturn(null);
+
+        var result = userService.findUserById(userId);
+
+        assertTrue(result.isFailure(), "실패");
+        assertNotNull(result.getErrors());
+        assertFalse(result.getErrors().isEmpty(), "에러 리스트가 있어야 한다.");
+        assertInstanceOf(NotFoundError.class, result.getErrors().get(0), "에러는 NotFoundError 이어야 한다.");
+    }
+
+
 }
