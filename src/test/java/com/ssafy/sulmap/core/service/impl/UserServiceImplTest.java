@@ -54,14 +54,12 @@ class UserServiceImplTest {
     @Test
     void registerUser_success() {
         // given
-        String pw = "plain-password";
-        var email = "test@example.com";
-        var req = createUserModel(email);
+        var createModel = _fixtureMonkey.giveMeOne(UserModel.class);
 
-        when(userRepository.findByLoginId(req.getLoginId())).thenReturn(null);
+        when(userRepository.findByLoginId(createModel.getLoginId())).thenReturn(null);
         when(userRepository.create(any(CreateUserCommand.class))).thenReturn(1L);
 
-        Result<Long> result = userService.registerUser(req);
+        Result<Long> result = userService.registerUser(createModel);
 
         assertTrue(result.isSuccess(), "회원가입은 성공해야 한다.");
         assertEquals(1L, result.getValue().orElseThrow());
@@ -70,13 +68,11 @@ class UserServiceImplTest {
     //회원가입 실패 -> 로그인 아이디 중복
     @Test
     void registerUser_duplicateLoginID_returnsConflictErrorError() {
-        String pw = "plain-password";
-        var email = "test@example.com";
-        var req = createUserModel(email);
+        var createModel = _fixtureMonkey.giveMeOne(UserModel.class);
 
-        when(userRepository.findByLoginId(req.getLoginId())).thenReturn(FindUserResult.builder().build());
+        when(userRepository.findByLoginId(createModel.getLoginId())).thenReturn(FindUserResult.builder().build());
 
-        Result<Long> result = userService.registerUser(req);
+        Result<Long> result = userService.registerUser(createModel);
 
         assertTrue(result.isFailure(), "중복 로그인아이디면 실패해야 한다.");
         assertNotNull(result.getErrors());
