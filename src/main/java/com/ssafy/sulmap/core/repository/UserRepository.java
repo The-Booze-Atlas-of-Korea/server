@@ -19,5 +19,5 @@ public interface UserRepository {
     FindUserResult findById(long id);
     /// loginid로 유저찾기
     /// @return FindUserResult
-    FindUserResult findByLoginId(long id);
+    FindUserResult findByLoginId(String id);
 }
