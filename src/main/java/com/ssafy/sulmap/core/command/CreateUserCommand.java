@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Builder
 @Data
-public class CreatUserCommand {
+public class CreateUserCommand {
     String loginId;
     String passwordHash;
     String name;
