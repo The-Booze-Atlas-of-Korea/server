@@ -48,9 +48,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result<Long> updateUserProfile(UpdateUserProfileCommand command) {
-        var userOpt = _userRepository.findByLoginId(command.getLoginId());
+        var userOpt = _userRepository.findById(command.getUserId());
         if (userOpt.isEmpty()) {
-            return Result.fail(new NotFoundError("userLoginId", command.getLoginId()));
+            return Result.fail(new NotFoundError("userId", command.getUserId()));
         }
 
         var userModel = userOpt.get();
