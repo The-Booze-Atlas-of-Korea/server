@@ -1,6 +1,5 @@
 package com.ssafy.sulmap.core.service;
 
-import com.ssafy.sulmap.core.model.MemberDrinkHistoryOpen;
 import com.ssafy.sulmap.core.model.UserModel;
 import com.ssafy.sulmap.core.model.command.CreateUserCommand;
 import com.ssafy.sulmap.core.model.command.UpdateUserProfileCommand;
