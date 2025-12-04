@@ -1,134 +1,111 @@
 package com.ssafy.sulmap.core.service.impl;
 
-import com.ssafy.sulmap.core.command.CreateUserCommand;
-import com.ssafy.sulmap.core.command.UpdateUserCommand;
-import com.ssafy.sulmap.core.model.MemberDrinkHistoryOpen;
+import com.ssafy.sulmap.core.model.command.CreateUserCommand;
+import com.ssafy.sulmap.core.model.command.UpdateUserProfileCommand;
 import com.ssafy.sulmap.core.model.UserModel;
-import com.ssafy.sulmap.core.model.UserUpdateModel;
+import com.ssafy.sulmap.core.model.enums.UserProfileVisitVisibility;
+import com.ssafy.sulmap.core.model.enums.UserStatus;
 import com.ssafy.sulmap.core.repository.UserRepository;
 import com.ssafy.sulmap.core.service.UserService;
 import com.ssafy.sulmap.share.result.Result;
 import com.ssafy.sulmap.share.result.error.impl.ConflictError;
 import com.ssafy.sulmap.share.result.error.impl.NotFoundError;
-import com.ssafy.sulmap.share.result.error.impl.ServerError;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-
-    private boolean userExist(long userId){
-        var findResult = userRepository.findById(userId);
-        return findResult != null && findResult.getDeletedAt() == null;
-    }
-    private boolean userExist(String userLoginId){
-        var findResult = userRepository.findByLoginId(userLoginId);
-        return findResult != null && findResult.getDeletedAt() == null;
-    }
+    private final UserRepository _userRepository;
+    private final PasswordEncoder _passwordEncoder;
 
     @Override
-    public Result<Long> registerUser(UserModel userModel) {
-        if(userExist(userModel.getLoginId())) {
-            return Result.fail(new ConflictError("이미 존재하는 로그인 아이디"));
+    public Result<Long> CreateUser(CreateUserCommand command) {
+        var userOpt = _userRepository.findByLoginId(command.getLoginId());
+        if (userOpt.isPresent()) {
+            return Result.fail(new ConflictError("로그인 아이디가 이미 존재합니다."));
         }
 
-        var command = CreateUserCommand.builder()
-                .loginId(userModel.getLoginId())
-                .passwordHash(passwordEncoder.encode(userModel.getPassword()))
-                .name(userModel.getName())
-                .email(userModel.getEmail())
-                .phone(userModel.getPhone())
-                .gender(userModel.getGender())
-                .address(userModel.getAddress())
-                .birthday(userModel.getBirth())
+        var userModel = UserModel.builder()
+                .loginId(command.getLoginId())
+                .passwordHash(_passwordEncoder.encode(command.getPassword()))
+                .name(command.getName())
+                .email(command.getEmail())
+                .phone(command.getPhone())
+                .address(command.getAddress())
+                .birthday(command.getBirthday())
+                .gender(command.getGender())
                 .build();
 
-        var createResult = userRepository.create(command);
-        if(createResult == null) {
-            return Result.fail(new ServerError("userRepository.create 실패", command));
-        }
+        var result = _userRepository.save(userModel);
 
-        return Result.ok(createResult);
+        return Result.ok(result);
     }
 
     @Override
-    public Result<Long> updateUser(long userId, UserUpdateModel userUpdateModel) {
-        if(!userExist(userId)) {
+    public Result<Long> updateUserProfile(UpdateUserProfileCommand command) {
+        var userOpt = _userRepository.findByLoginId(command.getLoginId());
+        if (userOpt.isEmpty()) {
+            return Result.fail(new NotFoundError("userLoginId", command.getLoginId()));
+        }
+
+        var userModel = userOpt.get();
+        userModel.setName(command.getName());
+        userModel.setEmail(command.getEmail());
+        userModel.setAddress(command.getAddress());
+        userModel.setGender(command.getGender());
+        userModel.setProfileImageUrl(command.getProfileImageUrl());
+        userModel.setBirthday(command.getBirthday());
+        userModel.setGender(command.getGender());
+        userModel.setPhone(command.getPhone());
+
+        var result = _userRepository.save(userModel);
+        return Result.ok(result);
+    }
+
+    @Override
+    public Result<Long> softDeleteUser(long userId) {
+        var userOpt = _userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
             return Result.fail(new NotFoundError("userId", userId));
         }
 
-        var userUpdateCommand = UpdateUserCommand.builder()
-                .name(userUpdateModel.getName())
-                .phone(userUpdateModel.getPhone())
-                .email(userUpdateModel.getEmail())
-                .birthday(userUpdateModel.getBirth())
-                .address(userUpdateModel.getAddress())
-                .gender(userUpdateModel.getGender())
-                .build();
+        var userModel = userOpt.get();
+        userModel.setStatus(UserStatus.WITHDRAWN);
+        userModel.setDeletedAt(new Date());
 
-        var updateResult = userRepository.update(userUpdateCommand);
-        if(updateResult == null) {
-            return Result.fail(new ServerError("userRepository.update 실패", userUpdateCommand));
-        }
-
-        return Result.ok(updateResult);
+        var result = _userRepository.save(userModel);
+        return Result.ok(result);
     }
 
     @Override
-    public Result deleteUser(long userId) {
-        //id 존재 여부 체크
-        if(!userExist(userId)) {
+    public Result<Long> updateUserProfileVisitVisibility(long userId, UserProfileVisitVisibility visibility) {
+        var userOpt = _userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
             return Result.fail(new NotFoundError("userId", userId));
         }
 
-        var deleteResult = userRepository.delete(userId);
-        if(!deleteResult) {
-            return Result.fail(new ServerError("userRepository.delete 실패", userId));
-        }
+        var userModel = userOpt.get();
+        userModel.setVisitVisibilitySetting(visibility);
 
-        return Result.ok();
-    }
-
-
-    @Override
-    public Result<Long> updateUserDrinkHistory(long userId, MemberDrinkHistoryOpen historyOpen) {
-        if(!userExist(userId)) {
-            return Result.fail(new NotFoundError("userId", userId));
-        }
-
-        var updateResult = userRepository.updateDrinkHistoryVisibility(userId, historyOpen);
-        if(updateResult == null) {
-            return Result.fail(new ServerError("userRepository.updateDrinkHistoryVisibility 실패", userId));
-        }
-
-        return Result.ok(updateResult);
+        var result = _userRepository.save(userModel);
+        return Result.ok(result);
     }
 
     @Override
-    public Result<UserModel> findUserById(String userId) {
-        var findResult = userRepository.findByLoginId(userId);
-        if(findResult == null){
-            return  Result.fail(new NotFoundError("userId", userId));
-        }
+    public Result<UserModel> findUserByLoginId(String userLoginId) {
+        var userOpt = _userRepository.findByLoginId(userLoginId);
+        return userOpt.map(Result::ok).orElseGet(() -> Result.fail(new NotFoundError("userLoginId", userLoginId)));
 
-        UserModel modleResult = UserModel.builder()
-                .loginId(findResult.getLoginId())
-                .password(findResult.getPasswordHash())
-                .name(findResult.getName())
-                .phone(findResult.getPhone())
-                .email(findResult.getEmail())
-                .birth(findResult.getBirthday())
-                .address(findResult.getAddress())
-                .gender(findResult.getGender())
-                .profile_image_url(findResult.getProfileImageUrl())
-                .build();
+    }
 
-        return Result.ok(modleResult);
+    @Override
+    public Result<UserModel> findUserById(Long userId) {
+        var userOpt = _userRepository.findById(userId);
+        return userOpt.map(Result::ok).orElseGet(() -> Result.fail(new NotFoundError("userId", userId)));
     }
 }
