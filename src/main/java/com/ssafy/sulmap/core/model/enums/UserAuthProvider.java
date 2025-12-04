@@ -13,7 +13,7 @@ public enum UserAuthProvider {
         };
     }
 
-    public String getValue()
+    public String toString()
     {
         return this.name();
     }
