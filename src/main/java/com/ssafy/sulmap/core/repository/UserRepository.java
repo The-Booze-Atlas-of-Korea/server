@@ -1,27 +1,19 @@
 package com.ssafy.sulmap.core.repository;
 
-import com.ssafy.sulmap.core.command.CreateUserCommand;
-import com.ssafy.sulmap.core.command.UpdateUserCommand;
-import com.ssafy.sulmap.core.model.MemberDrinkHistoryOpen;
-import com.ssafy.sulmap.core.query.FindUserResult;
+import com.ssafy.sulmap.core.model.UserModel;
+
+import java.util.Optional;
 
 public interface UserRepository {
-    /// 유저 생성
+    /// 유저 생성 <br>
+    /// 유저 id가 null이거나 0이면 생성 <br>
+    /// 아니면 업데이트
     /// @return 만들어진 user id
-    Long create(CreateUserCommand creatUserCommand);
-    /// 유저 업데이트
-    /// @return 업데이트 된 user id
-    Long update(UpdateUserCommand updateUserCommand);
-    /// 유저 삭제
-    /// @return 성공 여부
-    boolean delete(long id);
+    Long save(UserModel user);
     /// 유저 찾기
     /// @return FindUserResult
-    FindUserResult findById(long id);
+    Optional<UserModel> findById(long userId);
     /// loginid로 유저찾기
     /// @return FindUserResult
-    FindUserResult findByLoginId(String id);
-    /// 유저 프로필 보여주기 업데이트
-    /// @return 업데이트 된 user id
-    Long updateDrinkHistoryVisibility(long id, MemberDrinkHistoryOpen open);
+    Optional<UserModel> findByLoginId(String userLoginId);
 }

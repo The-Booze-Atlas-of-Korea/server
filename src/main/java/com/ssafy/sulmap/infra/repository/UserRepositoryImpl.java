@@ -1,17 +1,11 @@
 package com.ssafy.sulmap.infra.repository;
 
-import com.ssafy.sulmap.core.command.CreateUserCommand;
-import com.ssafy.sulmap.core.command.UpdateUserCommand;
-import com.ssafy.sulmap.core.model.MemberDrinkHistoryOpen;
-import com.ssafy.sulmap.core.query.FindUserResult;
+import com.ssafy.sulmap.core.model.UserModel;
 import com.ssafy.sulmap.core.repository.UserRepository;
+import java.util.Optional;
+
 import com.ssafy.sulmap.infra.mapper.UserMapper;
 import com.ssafy.sulmap.infra.model.UserEntity;
-import com.ssafy.sulmap.share.result.error.exception.ResultException;
-import com.ssafy.sulmap.share.result.error.impl.ValidationError;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,107 +13,30 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
-
     private final UserMapper userMapper;
 
     @Override
     @Transactional
-    public Long create(CreateUserCommand createUserCommand) {
-        UserEntity entity = toEntity(createUserCommand);
-        userMapper.insert(entity);
+    public Long save(UserModel user) {
+        var entity = UserEntity.fromUserModel(user);
+        if(user.getId()==null){
+            userMapper.insert(entity);
+        }
+        else{
+            userMapper.update(entity);
+        }
         return entity.getId();
     }
 
     @Override
-    @Transactional
-    public Long update(UpdateUserCommand updateUserCommand) {
-        if (updateUserCommand.getId() == null) {
-            throw new ResultException(
-                    List.of(new ValidationError("User id is required for update"))
-            );
-        }
-        UserEntity entity = toEntity(updateUserCommand);
-        int updated = userMapper.update(entity);
-        return updated > 0 ? updateUserCommand.getId() : null;
+    public Optional<UserModel> findById(long userId) {
+        UserEntity entity = userMapper.selectById(userId);
+        return Optional.ofNullable(entity).map(UserEntity::toUserModel);
     }
 
     @Override
-    @Transactional
-    public boolean delete(long id) {
-        return userMapper.softDelete(id) > 0;
-    }
-
-    @Override
-    public FindUserResult findById(long id) {
-        UserEntity entity = userMapper.selectById(id);
-        return toResult(entity);
-    }
-
-    @Override
-    public FindUserResult findByLoginId(String loginId) {
-        UserEntity entity = userMapper.selectByLoginId(loginId);
-        return toResult(entity);
-    }
-
-    @Override
-    public Long updateDrinkHistoryVisibility(long id, MemberDrinkHistoryOpen open) {
-        //todo 구현필요
-        return 0L;
-    }
-
-    private UserEntity toEntity(CreateUserCommand command) {
-        Date now = new Date();
-        return UserEntity.builder()
-                .loginId(command.getLoginId())
-                .passwordHash(command.getPasswordHash())
-                .name(command.getName())
-                .email(command.getEmail())
-                .phone(command.getPhone())
-                .address(command.getAddress())
-                .birthday(command.getBirthday())
-                .gender(command.getGender())
-                .profileImageUrl(null)
-                .authProvider("LOCAL")
-                .status("ACTIVE")
-                .visitVisibilitySetting("PRIVATE")
-                .createdAt(now)
-                .updatedAt(now)
-                .build();
-    }
-
-    private UserEntity toEntity(UpdateUserCommand command) {
-        return UserEntity.builder()
-                .id(command.getId())
-                .name(command.getName())
-                .email(command.getEmail())
-                .phone(command.getPhone())
-                .address(command.getAddress())
-                .birthday(command.getBirthday())
-                .gender(command.getGender())
-                .updatedAt(new Date())
-                .build();
-    }
-
-    private FindUserResult toResult(UserEntity entity) {
-        if (Objects.isNull(entity)) {
-            return null;
-        }
-        return FindUserResult.builder()
-                .loginId(entity.getLoginId())
-                .passwordHash(entity.getPasswordHash())
-                .name(entity.getName())
-                .email(entity.getEmail())
-                .phone(entity.getPhone())
-                .address(entity.getAddress())
-                .birthday(entity.getBirthday())
-                .gender(entity.getGender())
-                .profileImageUrl(entity.getProfileImageUrl())
-                .status(entity.getStatus())
-                .visit_visibility(entity.getVisitVisibilitySetting())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .deletedAt(entity.getDeletedAt())
-                .lastLogin(entity.getLastLoginAt())
-                .build();
+    public Optional<UserModel> findByLoginId(String userLoginId) {
+        UserEntity entity = userMapper.selectByLoginId(userLoginId);
+        return Optional.ofNullable(entity).map(UserEntity::toUserModel);
     }
 }

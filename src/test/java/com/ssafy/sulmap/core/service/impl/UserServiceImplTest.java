@@ -1,12 +1,10 @@
 package com.ssafy.sulmap.core.service.impl;
 
 import com.navercorp.fixturemonkey.FixtureMonkey;
-import com.ssafy.sulmap.core.command.CreateUserCommand;
-import com.ssafy.sulmap.core.command.UpdateUserCommand;
-import com.ssafy.sulmap.core.model.MemberDrinkHistoryOpen;
+import com.ssafy.sulmap.core.model.command.CreateUserCommand;
+import com.ssafy.sulmap.core.model.command.UpdateUserProfileCommand;
 import com.ssafy.sulmap.core.model.UserModel;
-import com.ssafy.sulmap.core.model.UserUpdateModel;
-import com.ssafy.sulmap.core.query.FindUserResult;
+import com.ssafy.sulmap.core.model.enums.UserProfileVisitVisibility;
 import com.ssafy.sulmap.core.repository.UserRepository;
 import com.ssafy.sulmap.share.result.Result;
 import com.ssafy.sulmap.share.result.error.impl.ConflictError;
@@ -19,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Date;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,43 +35,43 @@ class UserServiceImplTest {
     private FixtureMonkey _fixtureMonkey;
 
     @Mock
-    private UserRepository userRepository;
+    private UserRepository _userRepository;
 
     @Mock
-    private PasswordEncoder passwordHasher;
+    private PasswordEncoder _passwordHasher;
 
     @InjectMocks
-    private UserServiceImpl userService; // UserService 구현체
+    private UserServiceImpl _userService; // UserService 구현체
 
     @BeforeEach
     void setUp() {
-        // @InjectMocks 로 생성자/필드 주입 자동 처리
         _fixtureMonkey = FixtureMonkey.create();
     }
 
     //회원가입 성공
     @Test
-    void registerUser_success() {
-        // given
-        var createModel = _fixtureMonkey.giveMeOne(UserModel.class);
+    void CreateUser_success() {
+        var createUserCommand = _fixtureMonkey.giveMeOne(CreateUserCommand.class);
+        var userId = _fixtureMonkey.giveMeOne(Long.class);
 
-        when(userRepository.findByLoginId(createModel.getLoginId())).thenReturn(null);
-        when(userRepository.create(any(CreateUserCommand.class))).thenReturn(1L);
+        when(_userRepository.findByLoginId(createUserCommand.getLoginId())).thenReturn(Optional.empty());
+        when(_userRepository.save(any(UserModel.class))).thenReturn(userId);
 
-        Result<Long> result = userService.registerUser(createModel);
+        Result<Long> result = _userService.CreateUser(createUserCommand);
 
         assertTrue(result.isSuccess(), "회원가입은 성공해야 한다.");
-        assertEquals(1L, result.getValue().orElseThrow());
+        assertEquals(userId, result.getValue().orElseThrow());
     }
 
     //회원가입 실패 -> 로그인 아이디 중복
     @Test
-    void registerUser_duplicateLoginID_returnsConflictErrorError() {
-        var createModel = _fixtureMonkey.giveMeOne(UserModel.class);
+    void CreateUser_duplicateLoginID_returnsConflictErrorError() {
+        var createUserCommand = _fixtureMonkey.giveMeOne(CreateUserCommand.class);
+        var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
 
-        when(userRepository.findByLoginId(createModel.getLoginId())).thenReturn(FindUserResult.builder().build());
+        when(_userRepository.findByLoginId(createUserCommand.getLoginId())).thenReturn(Optional.ofNullable(userModel));
 
-        Result<Long> result = userService.registerUser(createModel);
+        Result<Long> result = _userService.CreateUser(createUserCommand);
 
         assertTrue(result.isFailure(), "중복 로그인아이디면 실패해야 한다.");
         assertNotNull(result.getErrors());
@@ -87,26 +85,29 @@ class UserServiceImplTest {
     /// Result<Long> updateUser(long userId, UserUpdateModel userUpdateModel);<br/>
     // 유저 업데이트 성공
     @Test
-    void updateUser_success() {
-        var updateModel = _fixtureMonkey.giveMeOne(UserUpdateModel.class);
-        var userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(FindUserResult.builder().build());
-        when(userRepository.update(any(UpdateUserCommand.class))).thenReturn(1L);
+    void updateUserProfile_success() {
+        var updateCommand = _fixtureMonkey.giveMeOne(UpdateUserProfileCommand.class);
+        var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
+        userModel.setId(updateCommand.getUserId());
 
-        var result =  userService.updateUser(userId, updateModel);
+        when(_userRepository.findById(updateCommand.getUserId())).thenReturn(Optional.of(userModel));
+        when(_userRepository.save(any(UserModel.class))).thenReturn(updateCommand.getUserId());
+
+        var result =  _userService.updateUserProfile(updateCommand);
 
         assertTrue(result.isSuccess(), "성공");
-        assertEquals(1L, result.getValue().orElseThrow());
+        assertNotNull(userModel);
+        assertEquals(userModel.getId(), result.getValue().orElseThrow());
     }
 
     // 유저 업데이트 성공
     @Test
-    void updateUser_NotFoundUserId_returnsNotFoundError() {
-        var updateModel = _fixtureMonkey.giveMeOne(UserUpdateModel.class);
-        var userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(null);
+    void updateUserProfile_NotFoundUserId_returnsNotFoundError() {
+        var updateCommand = _fixtureMonkey.giveMeOne(UpdateUserProfileCommand.class);
 
-        var result = userService.updateUser(userId, updateModel);
+        when(_userRepository.findById(updateCommand.getUserId())).thenReturn(Optional.empty());
+
+        var result = _userService.updateUserProfile(updateCommand);
 
         assertTrue(result.isFailure(), "실패");
         assertNotNull(result.getErrors());
@@ -119,23 +120,27 @@ class UserServiceImplTest {
     // Result deleteUser(long userId);
     // 유저 삭제 성공
     @Test
-    void deleteUser_success() {
+    void softDeleteUser_success() {
         var userId = _fixtureMonkey.giveMeOne(Long.class);
+        var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
+        userModel.setId(userId);
 
-        when(userRepository.findById(userId)).thenReturn(FindUserResult.builder().build());
-        when(userRepository.delete(userId)).thenReturn(Boolean.TRUE);
+        when(_userRepository.findById(userId)).thenReturn(Optional.of(userModel));
+        when(_userRepository.save(any(UserModel.class))).thenReturn(userId);
 
-        var result = userService.deleteUser(userId);
+        var result = _userService.softDeleteUser(userId);
         assertTrue(result.isSuccess(), "성공");
+        assertNotNull(userModel);
+        assertEquals(userId, result.getValue().orElseThrow());
     }
 
     @Test
-    void deleteUser_NotFoundUserId_returnsNotFoundError() {
+    void softDeleteUser_NotFoundUserId_returnsNotFoundError() {
         var userId = _fixtureMonkey.giveMeOne(Long.class);
 
-        when(userRepository.findById(userId)).thenReturn(null);
+        when(_userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        var result = userService.deleteUser(userId);
+        var result = _userService.softDeleteUser(userId);
 
         assertTrue(result.isFailure(), "실패");
         assertNotNull(result.getErrors());
@@ -150,28 +155,32 @@ class UserServiceImplTest {
     //업데이트 성공
     // 유저 업데이트 성공
     @Test
-    void updateUserDrinkHistory_success() {
-        var memberDrinkHistoryOpen = _fixtureMonkey.giveMeOne(MemberDrinkHistoryOpen.class);
-        var userId = 1L;
+    void updateUserProfileVisitVisibility_success() {
+        var userProfileVisitVisibility = _fixtureMonkey.giveMeOne(UserProfileVisitVisibility.class);
+        var userId = _fixtureMonkey.giveMeOne(Long.class);
+        var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
+        userModel.setId(userId);
 
-        when(userRepository.findById(userId)).thenReturn(FindUserResult.builder().build());
-        when(userRepository.updateDrinkHistoryVisibility(userId, memberDrinkHistoryOpen)).thenReturn(1L);
+        when(_userRepository.findById(userId)).thenReturn(Optional.of(userModel));
+        when(_userRepository.save(any(UserModel.class))).thenReturn(userId);
 
-        var result =  userService.updateUserDrinkHistory(userId, memberDrinkHistoryOpen);
+        var result =  _userService.updateUserProfileVisitVisibility(userId, userProfileVisitVisibility);
 
         assertTrue(result.isSuccess(), "성공");
-        assertEquals(1L, result.getValue().orElseThrow());
+        assertEquals(userId, result.getValue().orElseThrow());
     }
 
     // 유저 업데이트 실패 -> 유저 id 찾을수 없음
     @Test
     void updateUserDrinkHistory_NotFoundUserId_returnsNotFoundError() {
-        var memberDrinkHistoryOpen = _fixtureMonkey.giveMeOne(MemberDrinkHistoryOpen.class);
-        var userId = 1L;
+        var userProfileVisitVisibility = _fixtureMonkey.giveMeOne(UserProfileVisitVisibility.class);
+        var userId = _fixtureMonkey.giveMeOne(Long.class);
+        var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
+        userModel.setId(userId);
 
-        when(userRepository.findById(userId)).thenReturn(null);
+        when(_userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        var result =  userService.updateUserDrinkHistory(userId, memberDrinkHistoryOpen);
+        var result =  _userService.updateUserProfileVisitVisibility(userId, userProfileVisitVisibility);
 
         assertTrue(result.isFailure(), "실패");
         assertNotNull(result.getErrors());
@@ -184,38 +193,62 @@ class UserServiceImplTest {
     //Result<UserModel> findUserById(String userId);
     //유저 찾기 성공
     @Test
-    void findUserById_success() {
-        var userId = _fixtureMonkey.giveMeOne(String.class);
-        var findResult = _fixtureMonkey.giveMeOne(FindUserResult.class);
+    void findUserByLoginId_success() {
+        var userLoginId = _fixtureMonkey.giveMeOne(String.class);
+        var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
+        userModel.setLoginId(userLoginId);
 
-        when(userRepository.findByLoginId(userId)).thenReturn(findResult);
+        when(_userRepository.findByLoginId(userLoginId)).thenReturn(Optional.of(userModel));
 
-        var result = userService.findUserById(userId);
-
-        UserModel modelResult = UserModel.builder()
-                .loginId(findResult.getLoginId())
-                .password(findResult.getPasswordHash())
-                .name(findResult.getName())
-                .phone(findResult.getPhone())
-                .email(findResult.getEmail())
-                .birth(findResult.getBirthday())
-                .address(findResult.getAddress())
-                .gender(findResult.getGender())
-                .profile_image_url(findResult.getProfileImageUrl())
-                .build();
+        var result = _userService.findUserByLoginId(userLoginId);
 
         assertTrue(result.isSuccess(), "성공");
-        assertEquals(modelResult.toString(), result.getValue().orElseThrow().toString());
+        assertEquals(userModel.toString(), result.getValue().orElseThrow().toString());
+    }
+
+    //유저 찾기 실패 -> id를 찾을수 없음
+    @Test
+    void findUserByLoginId_NotFoundUserId_returnsNotFoundError() {
+        var userLoginId = _fixtureMonkey.giveMeOne(String.class);
+        var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
+        userModel.setLoginId(userLoginId);
+
+        when(_userRepository.findByLoginId(userLoginId)).thenReturn(Optional.empty());
+
+        var result = _userService.findUserByLoginId(userLoginId);
+
+        assertTrue(result.isFailure(), "실패");
+        assertNotNull(result.getErrors());
+        assertFalse(result.getErrors().isEmpty(), "에러 리스트가 있어야 한다.");
+        assertInstanceOf(NotFoundError.class, result.getErrors().get(0), "에러는 NotFoundError 이어야 한다.");
+    }
+
+    //유저 찾기 성공
+    @Test
+    void findUserById_success() {
+        var userId = _fixtureMonkey.giveMeOne(Long.class);
+        var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
+        userModel.setId(userId);
+
+        when(_userRepository.findById(userId)).thenReturn(Optional.of(userModel));
+
+        var result = _userService.findUserById(userId);
+
+        assertTrue(result.isSuccess(), "성공");
+        assertEquals(userModel.toString(), result.getValue().orElseThrow().toString());
     }
 
     //유저 찾기 실패 -> id를 찾을수 없음
     @Test
     void findUserById_NotFoundUserId_returnsNotFoundError() {
-        var userId = _fixtureMonkey.giveMeOne(String.class);
+        var userId = _fixtureMonkey.giveMeOne(Long.class);
+        var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
+        userModel.setId(userId);
 
-        when(userRepository.findByLoginId(userId)).thenReturn(null);
 
-        var result = userService.findUserById(userId);
+        when(_userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        var result = _userService.findUserById(userId);
 
         assertTrue(result.isFailure(), "실패");
         assertNotNull(result.getErrors());

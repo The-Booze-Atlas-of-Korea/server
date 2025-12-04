@@ -1,6 +1,12 @@
 package com.ssafy.sulmap.infra.model;
 
 import java.util.Date;
+
+import com.ssafy.sulmap.core.model.UserModel;
+import com.ssafy.sulmap.core.model.enums.UserAuthProvider;
+import com.ssafy.sulmap.core.model.enums.UserGender;
+import com.ssafy.sulmap.core.model.enums.UserProfileVisitVisibility;
+import com.ssafy.sulmap.core.model.enums.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,4 +35,51 @@ public class UserEntity {
     private Date updatedAt;
     private Date deletedAt;
     private Date lastLoginAt;
+
+
+    public static UserEntity fromUserModel(UserModel userModel) {
+        return UserEntity.builder()
+                .id(userModel.getId())
+                .loginId(userModel.getLoginId())
+                .passwordHash(userModel.getPasswordHash())
+                .name(userModel.getName())
+                .email(userModel.getEmail())
+                .phone(userModel.getPhone())
+                .address(userModel.getAddress())
+                .birthday(userModel.getBirthday())
+                .gender(userModel.getGender().toString())
+                .profileImageUrl(userModel.getProfileImageUrl())
+                .authProvider(userModel.getAuthProvider().toString())
+                .providerId(userModel.getProviderId())
+                .status(userModel.getStatus().toString())
+                .visitVisibilitySetting(userModel.getVisitVisibilitySetting().toString())
+                .createdAt(userModel.getCreatedAt())
+                .updatedAt(userModel.getUpdatedAt())
+                .deletedAt(userModel.getDeletedAt())
+                .lastLoginAt(userModel.getLastLoginAt())
+                .build();
+    }
+
+    public UserModel toUserModel() {
+        return UserModel.builder()
+                .id(id)
+                .loginId(loginId)
+                .passwordHash(passwordHash)
+                .name(name)
+                .email(email)
+                .phone(phone)
+                .address(address)
+                .birthday(birthday)
+                .gender(UserGender.fromString(gender))
+                .profileImageUrl(profileImageUrl)
+                .authProvider(UserAuthProvider.fromValue(authProvider))
+                .providerId(providerId)
+                .status(UserStatus.fromString(status))
+                .visitVisibilitySetting(UserProfileVisitVisibility.fromString(visitVisibilitySetting))
+                .createdAt(createdAt)
+                .updatedAt(updatedAt)
+                .deletedAt(deletedAt)
+                .lastLoginAt(lastLoginAt)
+                .build();
+    }
 }
