@@ -1,6 +1,7 @@
 package com.ssafy.sulmap.core.model;
 
 import com.ssafy.sulmap.core.model.enums.UserAuthProvider;
+import com.ssafy.sulmap.core.model.enums.UserGender;
 import com.ssafy.sulmap.core.model.enums.UserProfileVisitVisibility;
 import com.ssafy.sulmap.core.model.enums.UserStatus;
 import lombok.*;
@@ -20,7 +21,7 @@ public class UserModel {
     private String phone;
     private String address;
     private Date birthday;
-    private String gender;
+    private UserGender gender;
     private String profileImageUrl;
     private UserAuthProvider authProvider;
     private String providerId;
