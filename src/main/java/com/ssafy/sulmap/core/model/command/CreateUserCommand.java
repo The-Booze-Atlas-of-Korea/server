@@ -13,7 +13,7 @@ import java.util.Date;
 @NoArgsConstructor
 public class CreateUserCommand {
     private String loginId;
-    private String passwordHash;
+    private String password;
     private String name;
     private String email;
     private String phone;
