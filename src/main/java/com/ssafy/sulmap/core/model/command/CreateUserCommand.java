@@ -1,5 +1,6 @@
 package com.ssafy.sulmap.core.model.command;
 
+import com.ssafy.sulmap.core.model.enums.UserGender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,5 +20,5 @@ public class CreateUserCommand {
     private String phone;
     private String address;
     private Date birthday;
-    private String gender;
+    private UserGender gender;
 }
