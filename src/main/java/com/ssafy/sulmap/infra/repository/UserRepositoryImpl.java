@@ -1,7 +1,8 @@
 package com.ssafy.sulmap.infra.repository;
 
-import com.ssafy.sulmap.core.command.CreatUserCommand;
+import com.ssafy.sulmap.core.command.CreateUserCommand;
 import com.ssafy.sulmap.core.command.UpdateUserCommand;
+import com.ssafy.sulmap.core.model.MemberDrinkHistoryOpen;
 import com.ssafy.sulmap.core.query.FindUserResult;
 import com.ssafy.sulmap.core.repository.UserRepository;
 import com.ssafy.sulmap.infra.mapper.UserMapper;
@@ -23,7 +24,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     @Transactional
-    public Long create(CreatUserCommand createUserCommand) {
+    public Long create(CreateUserCommand createUserCommand) {
         UserEntity entity = toEntity(createUserCommand);
         userMapper.insert(entity);
         return entity.getId();
@@ -59,7 +60,14 @@ public class UserRepositoryImpl implements UserRepository {
         UserEntity entity = userMapper.selectByLoginId(loginId);
         return toResult(entity);
     }
-    private UserEntity toEntity(CreatUserCommand command) {
+
+    @Override
+    public Long updateDrinkHistoryVisibility(long id, MemberDrinkHistoryOpen open) {
+        //todo 구현필요
+        return 0L;
+    }
+
+    private UserEntity toEntity(CreateUserCommand command) {
         Date now = new Date();
         return UserEntity.builder()
                 .loginId(command.getLoginId())

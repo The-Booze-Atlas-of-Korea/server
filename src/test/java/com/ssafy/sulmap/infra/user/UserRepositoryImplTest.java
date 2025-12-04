@@ -1,6 +1,6 @@
 package com.ssafy.sulmap.infra.user;
 
-import com.ssafy.sulmap.core.command.CreatUserCommand;
+import com.ssafy.sulmap.core.command.CreateUserCommand;
 import com.ssafy.sulmap.core.command.UpdateUserCommand;
 import com.ssafy.sulmap.core.query.FindUserResult;
 import com.ssafy.sulmap.infra.mapper.UserMapper;
@@ -30,11 +30,11 @@ public class UserRepositoryImplTest {
     @InjectMocks
     private UserRepositoryImpl userRepository;
 
-    private CreatUserCommand createUserCommand;
+    private CreateUserCommand createUserCommand;
 
     @BeforeEach
     void setUp(){
-        createUserCommand = CreatUserCommand.builder()
+        createUserCommand = CreateUserCommand.builder()
                 .loginId("tester")
                 .passwordHash("hashed")
                 .name("홍길동")
