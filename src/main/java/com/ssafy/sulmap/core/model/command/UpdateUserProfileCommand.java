@@ -15,7 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateUserProfileCommand {
-    private String loginId;
+    private Long userId;
     private String name;
     private String email;
     private String phone;
