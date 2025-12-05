@@ -1,6 +1,7 @@
 package com.ssafy.sulmap.core.service.impl;
 
 import com.ssafy.sulmap.core.model.command.CreateUserCommand;
+import com.ssafy.sulmap.core.model.command.LoginUserCommand;
 import com.ssafy.sulmap.core.model.command.UpdateUserProfileCommand;
 import com.ssafy.sulmap.core.model.UserModel;
 import com.ssafy.sulmap.core.model.enums.UserProfileVisitVisibility;
@@ -64,6 +65,24 @@ public class UserServiceImpl implements UserService {
         userModel.setPhone(command.getPhone());
 
         var result = _userRepository.save(userModel);
+        return Result.ok(result);
+    }
+
+    @Override
+    public Result<Long> LoginUser(LoginUserCommand command) {
+        var userOpt = _userRepository.findByLoginId(command.getLoginId());
+        if (userOpt.isEmpty()) {
+            return Result.fail(new NotFoundError("loginId", command.getLoginId()));
+        }
+
+        var userModel = userOpt.get();
+        if(!_passwordEncoder.matches(command.getPassword(), userModel.getPasswordHash())){
+            return Result.fail(new NotFoundError("password", command.getPassword()));
+        }
+
+        userModel.setLastLoginAt(new Date());
+        var result = _userRepository.save(userModel);
+
         return Result.ok(result);
     }
 

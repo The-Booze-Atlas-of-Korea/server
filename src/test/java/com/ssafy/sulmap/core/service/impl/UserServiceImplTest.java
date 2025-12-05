@@ -2,6 +2,7 @@ package com.ssafy.sulmap.core.service.impl;
 
 import com.navercorp.fixturemonkey.FixtureMonkey;
 import com.ssafy.sulmap.core.model.command.CreateUserCommand;
+import com.ssafy.sulmap.core.model.command.LoginUserCommand;
 import com.ssafy.sulmap.core.model.command.UpdateUserProfileCommand;
 import com.ssafy.sulmap.core.model.UserModel;
 import com.ssafy.sulmap.core.model.enums.UserProfileVisitVisibility;
@@ -38,14 +39,16 @@ class UserServiceImplTest {
     private UserRepository _userRepository;
 
     @Mock
-    private PasswordEncoder _passwordHasher;
+    private PasswordEncoder _passwordEncoder;
 
     @InjectMocks
     private UserServiceImpl _userService; // UserService 구현체
 
     @BeforeEach
     void setUp() {
-        _fixtureMonkey = FixtureMonkey.create();
+        _fixtureMonkey = FixtureMonkey.builder()
+                .defaultNotNull(true)
+                .build();
     }
 
     //회원가입 성공
@@ -256,5 +259,59 @@ class UserServiceImplTest {
         assertInstanceOf(NotFoundError.class, result.getErrors().get(0), "에러는 NotFoundError 이어야 한다.");
     }
 
+    /// FR2	사용자는 아이디와 비밀번호로 로그인 및 로그아웃을 할 수 있어야 한다. <br/>
+    /// NotFoundError 아이디 또는 비밀번호가 틀렸을때 <br/>
+    /// {@return UserID} <br/>
+    /// Result<Long> LoginUser(LoginUserCommand command);
+    //로그인 성공
+    @Test
+    void LoginUser_success() {
+        var command = _fixtureMonkey.giveMeOne(LoginUserCommand.class);
+        var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
+        userModel.setLoginId(command.getLoginId());
 
+        when(_userRepository.findByLoginId(command.getLoginId())).thenReturn(Optional.of(userModel));
+        when(_passwordEncoder.matches(command.getPassword(), userModel.getPasswordHash())).thenReturn(true);
+        when(_userRepository.save(any(UserModel.class))).thenReturn(userModel.getId());
+
+        var result = _userService.LoginUser(command);
+
+        assertTrue(result.isSuccess(), "성공");
+        assertEquals(userModel.getId(), result.getValue().orElseThrow());
+    }
+
+    //로그인 실패 - 아이디가 없음
+    @Test
+    void LoginUser_NotFoundUserId_returnsNotFoundError() {
+        var command = _fixtureMonkey.giveMeOne(LoginUserCommand.class);
+        var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
+        userModel.setLoginId(command.getLoginId());
+
+        when(_userRepository.findByLoginId(command.getLoginId())).thenReturn(Optional.empty());
+
+        var result = _userService.LoginUser(command);
+
+        assertTrue(result.isFailure(), "실패");
+        assertNotNull(result.getErrors());
+        assertFalse(result.getErrors().isEmpty(), "에러 리스트가 있어야 한다.");
+        assertInstanceOf(NotFoundError.class, result.getErrors().get(0), "에러는 NotFoundError 이어야 한다.");
+    }
+
+    //로그인 실패 - 비밀번호가 틀림
+    @Test
+    void LoginUser_NotFoundPassword_returnsNotFoundError() {
+        var command = _fixtureMonkey.giveMeOne(LoginUserCommand.class);
+        var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
+        userModel.setLoginId(command.getLoginId());
+
+        when(_userRepository.findByLoginId(command.getLoginId())).thenReturn(Optional.of(userModel));
+        when(_passwordEncoder.matches(command.getPassword(), userModel.getPasswordHash())).thenReturn(false);
+
+        var result = _userService.LoginUser(command);
+
+        assertTrue(result.isFailure(), "실패");
+        assertNotNull(result.getErrors());
+        assertFalse(result.getErrors().isEmpty(), "에러 리스트가 있어야 한다.");
+        assertInstanceOf(NotFoundError.class, result.getErrors().get(0), "에러는 NotFoundError 이어야 한다.");
+    }
 }

@@ -2,6 +2,7 @@ package com.ssafy.sulmap.core.service;
 
 import com.ssafy.sulmap.core.model.UserModel;
 import com.ssafy.sulmap.core.model.command.CreateUserCommand;
+import com.ssafy.sulmap.core.model.command.LoginUserCommand;
 import com.ssafy.sulmap.core.model.command.UpdateUserProfileCommand;
 import com.ssafy.sulmap.core.model.enums.UserProfileVisitVisibility;
 import com.ssafy.sulmap.share.result.Result;
@@ -15,6 +16,11 @@ public interface UserService {
     /// NotFoundError 찾을수 없는 아이디<br/>
     /// {@return UserID}
     Result<Long> updateUserProfile(UpdateUserProfileCommand command);
+
+    /// FR2	사용자는 아이디와 비밀번호로 로그인 및 로그아웃을 할 수 있어야 한다. <br/>
+    /// NotFoundError 아이디 또는 비밀번호가 틀렸을때 <br/>
+    /// {@return UserID}
+    Result<Long> LoginUser(LoginUserCommand command);
 
     /// FR7	사용자는 언제든지 계정을 탈퇴(삭제)할 수 있어야 하며, 관련 정책에 따라 데이터가 익명화 또는 삭제 처리되어야 한다.<br/>
     /// NotFoundError 찾을수 없는 아이디<br/>
