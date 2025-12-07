@@ -5,13 +5,10 @@ import com.ssafy.sulmap.api.dto.request.UpdateUserRequest;
 import com.ssafy.sulmap.api.dto.response.GetUserResponse;
 import com.ssafy.sulmap.core.model.command.UpdateUserProfileCommand;
 import com.ssafy.sulmap.core.model.enums.UserGender;
-import com.ssafy.sulmap.core.model.enums.UserStatus;
 import com.ssafy.sulmap.core.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,7 +64,7 @@ public class UserController {
     @GetMapping("user/{userid}")
     public ResponseEntity<?> getUserByUserId(@PathVariable("userid") Long UserId) throws Exception
     {
-        var result = userService.findUserById(UserId);
+        var result = userService.findUserByIdForViewer(UserId);
         if(result.isFailure()){
             return new ResponseEntity<>(result.getSingleErrorOrThrow().getStatus());
         }

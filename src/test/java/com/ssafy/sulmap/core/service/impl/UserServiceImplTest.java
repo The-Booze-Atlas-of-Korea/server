@@ -317,4 +317,57 @@ class UserServiceImplTest {
         assertFalse(result.getErrors().isEmpty(), "에러 리스트가 있어야 한다.");
         assertInstanceOf(NotFoundError.class, result.getErrors().get(0), "에러는 NotFoundError 이어야 한다.");
     }
+
+    //유저가 다른 유저의 프로필을 보기위해 모델을 불려올때
+    @Test
+    @DisplayName("ID로 Viewer용 유저 조회 성공 - 존재하는 UserId면 UserModel을 반환한다")
+    void findUserByIdForViewer_success() {
+        var userId = _fixtureMonkey.giveMeOne(Long.class);
+        var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
+        userModel.setVisitVisibilitySetting(UserProfileVisitVisibility.PUBLIC);
+        userModel.setId(userId);
+
+        when(_userRepository.findById(userId)).thenReturn(Optional.of(userModel));
+
+        var result = _userService.findUserByIdForViewer(userId);
+
+        assertTrue(result.isSuccess(), "성공");
+        assertEquals(userModel.toString(), result.getValue().orElseThrow().toString());
+    }
+
+    //유저 찾기 실패 -> id를 찾을수 없음
+    @Test
+    @DisplayName("ID로 Viewer용 유저 조회 실패 - 존재하지 않는 UserId면 NotFoundError를 반환한다")
+    void findUserByIdForViewer_NotFoundUserId_returnsNotFoundError() {
+        var userId = _fixtureMonkey.giveMeOne(Long.class);
+        var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
+        userModel.setId(userId);
+
+        when(_userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        var result = _userService.findUserByIdForViewer(userId);
+
+        assertTrue(result.isFailure(), "실패");
+        assertNotNull(result.getErrors());
+        assertFalse(result.getErrors().isEmpty(), "에러 리스트가 있어야 한다.");
+        assertInstanceOf(NotFoundError.class, result.getErrors().get(0), "에러는 NotFoundError 이어야 한다.");
+    }
+
+    @Test
+    @DisplayName("ID로 Viewer용 유저 조회 실패 - 프로필 공개가 private면 ConflictError를 반환한다.")
+    void findUserByIdForViewer_NotOpenProfile_returnsConflictError() {
+        var userId = _fixtureMonkey.giveMeOne(Long.class);
+        var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
+        userModel.setId(userId);
+        userModel.setVisitVisibilitySetting(UserProfileVisitVisibility.PRIVATE);
+
+        when(_userRepository.findById(userId)).thenReturn(Optional.of(userModel));
+
+        var result = _userService.findUserByIdForViewer(userId);
+
+        assertTrue(result.isFailure(), "실패");
+        assertNotNull(result.getErrors());
+        assertFalse(result.getErrors().isEmpty(), "에러 리스트가 있어야 한다.");
+        assertInstanceOf(ConflictError.class, result.getErrors().get(0), "에러는 ConflictError 이어야 한다.");
+    }
 }

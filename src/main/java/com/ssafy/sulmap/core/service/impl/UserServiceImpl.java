@@ -127,4 +127,19 @@ public class UserServiceImpl implements UserService {
         var userOpt = _userRepository.findById(userId);
         return userOpt.map(Result::ok).orElseGet(() -> Result.fail(new NotFoundError("userId", userId)));
     }
+
+    @Override
+    public Result<UserModel> findUserByIdForViewer(Long userId) {
+        var result = findUserById(userId);
+        if(result.isFailure()){
+            return Result.fail(result.getErrors());
+        }
+        var model = result.getOrThrow();
+        var visibility = model.getVisitVisibilitySetting();
+        if (visibility != UserProfileVisitVisibility.PUBLIC){
+            return Result.fail(new ConflictError("유저가 비공개 입니다."));
+        }
+
+        return Result.ok(model);
+    }
 }

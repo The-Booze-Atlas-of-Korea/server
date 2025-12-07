@@ -40,4 +40,10 @@ public interface UserService {
     /// NotFoundError 찾을수 없는 아이디<br/>
     /// {@return UserModel}
     Result<UserModel> findUserById(Long userId);
+
+    /// 유저가 다른 유저의 프로필을 보기위해 모델을 불려올때 <br>
+    /// NotFoundError 찾을수 없는 아이디<br/>
+    /// conflict 프로필이 비공개 일때<br/>
+    /// {@return UserModel}
+    Result<UserModel> findUserByIdForViewer(Long userId);
 }
