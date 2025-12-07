@@ -6,11 +6,7 @@ import com.ssafy.sulmap.share.result.error.impl.SimpleError;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -70,6 +66,20 @@ public final class Result<T> {
     public T getOrThrow() {
         if (isFailure()) {
             throw new ResultException(errors);
+        }
+        return value;
+    }
+
+    public ResultError getSingleErrorOrThrow() {
+        if (errors.isEmpty()) {
+            throw new NoSuchElementException("no result");
+        }
+        return errors.get(0);
+    }
+
+    public T getOrThrow(RuntimeException exception) {
+        if (isFailure()) {
+            throw exception;
         }
         return value;
     }
