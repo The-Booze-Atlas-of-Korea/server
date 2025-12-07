@@ -18,6 +18,7 @@ public class LoginUserDetail implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // 권한 시스템 사용 시 여기에 매핑
+
         return Collections.emptyList();
     }
 

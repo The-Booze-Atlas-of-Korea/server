@@ -95,6 +95,7 @@ public class SecurityConfig {
 
                 // 인가 규칙
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/auth/login", "/auth/signup").permitAll()
                         .requestMatchers(HttpMethod.GET, "/health", "/docs/**").permitAll()
                         .requestMatchers(_SWAGGER_WHITELIST).permitAll()
