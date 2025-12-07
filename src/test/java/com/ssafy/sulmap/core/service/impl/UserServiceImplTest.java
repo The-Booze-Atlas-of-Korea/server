@@ -11,6 +11,7 @@ import com.ssafy.sulmap.share.result.Result;
 import com.ssafy.sulmap.share.result.error.impl.ConflictError;
 import com.ssafy.sulmap.share.result.error.impl.NotFoundError;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;   // ⬅ 추가
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.when;
  * - 스프링 컨텍스트 없이
  * - UserServiceImpl이 UserRepository, PasswordHasher를 어떻게 호출하는지 검증
  */
+@DisplayName("UserServiceImpl 유닛 테스트")
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
 
@@ -53,6 +55,7 @@ class UserServiceImplTest {
 
     //회원가입 성공
     @Test
+    @DisplayName("회원가입 성공 - 새로운 로그인 아이디로 가입하면 UserId를 반환한다")
     void CreateUser_success() {
         var createUserCommand = _fixtureMonkey.giveMeOne(CreateUserCommand.class);
         var userId = _fixtureMonkey.giveMeOne(Long.class);
@@ -68,6 +71,7 @@ class UserServiceImplTest {
 
     //회원가입 실패 -> 로그인 아이디 중복
     @Test
+    @DisplayName("회원가입 실패 - 로그인 아이디 중복 시 ConflictError를 반환한다")
     void CreateUser_duplicateLoginID_returnsConflictErrorError() {
         var createUserCommand = _fixtureMonkey.giveMeOne(CreateUserCommand.class);
         var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
@@ -82,12 +86,10 @@ class UserServiceImplTest {
         assertInstanceOf(ConflictError.class, result.getErrors().get(0), "에러는 ConflictError 이어야 한다.");
     }
 
-    /// FR6	사용자는 자신의 프로필 정보(이름, 전화번호, 이메일, 주소 등)를 수정할 수 있어야 한다.<br/>
-    /// NotFoundError 찾을수 없는 아이디<br/>
-    /// {@return UserID}<br/>
-    /// Result<Long> updateUser(long userId, UserUpdateModel userUpdateModel);<br/>
+    /// FR6
     // 유저 업데이트 성공
     @Test
+    @DisplayName("프로필 수정 성공 - 존재하는 유저의 프로필 정보를 수정하면 UserId를 반환한다")
     void updateUserProfile_success() {
         var updateCommand = _fixtureMonkey.giveMeOne(UpdateUserProfileCommand.class);
         var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
@@ -103,8 +105,9 @@ class UserServiceImplTest {
         assertEquals(userModel.getId(), result.getValue().orElseThrow());
     }
 
-    // 유저 업데이트 성공
+    // 유저 업데이트 실패
     @Test
+    @DisplayName("프로필 수정 실패 - 존재하지 않는 유저 ID면 NotFoundError를 반환한다")
     void updateUserProfile_NotFoundUserId_returnsNotFoundError() {
         var updateCommand = _fixtureMonkey.giveMeOne(UpdateUserProfileCommand.class);
 
@@ -118,11 +121,10 @@ class UserServiceImplTest {
         assertInstanceOf(NotFoundError.class, result.getErrors().get(0), "에러는 NotFoundError 이어야 한다.");
     }
 
-    /// FR7	사용자는 언제든지 계정을 탈퇴(삭제)할 수 있어야 하며, 관련 정책에 따라 데이터가 익명화 또는 삭제 처리되어야 한다.<br/>
-    /// NotFoundError 찾을수 없는 아이디<br/>
-    // Result deleteUser(long userId);
+    /// FR7
     // 유저 삭제 성공
     @Test
+    @DisplayName("소프트 삭제 성공 - 존재하는 유저를 삭제하면 UserId를 반환한다")
     void softDeleteUser_success() {
         var userId = _fixtureMonkey.giveMeOne(Long.class);
         var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
@@ -138,6 +140,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("소프트 삭제 실패 - 존재하지 않는 유저 ID면 NotFoundError를 반환한다")
     void softDeleteUser_NotFoundUserId_returnsNotFoundError() {
         var userId = _fixtureMonkey.giveMeOne(Long.class);
 
@@ -151,13 +154,10 @@ class UserServiceImplTest {
         assertInstanceOf(NotFoundError.class, result.getErrors().get(0), "에러는 NotFoundError 이어야 한다.");
     }
 
-    /// FR19 사용자는 자신의 술자리 이력·방문 기록의 공개 범위(전체 공개 / 친구만 / 비공개)를 설정할 수 있어야 한다.<br/>
-    /// NotFoundError 찾을수 없는 아이디<br/>
-    /// {@return UserID}
-    //Result<Long> updateUserDrinkHistory(long userId, MemberDrinkHistoryOpen historyOpen);
+    /// FR19
     //업데이트 성공
-    // 유저 업데이트 성공
     @Test
+    @DisplayName("프로필 방문 공개 범위 수정 성공 - 존재하는 유저의 공개 범위를 변경하면 UserId를 반환한다")
     void updateUserProfileVisitVisibility_success() {
         var userProfileVisitVisibility = _fixtureMonkey.giveMeOne(UserProfileVisitVisibility.class);
         var userId = _fixtureMonkey.giveMeOne(Long.class);
@@ -175,6 +175,7 @@ class UserServiceImplTest {
 
     // 유저 업데이트 실패 -> 유저 id 찾을수 없음
     @Test
+    @DisplayName("프로필 방문 공개 범위 수정 실패 - 존재하지 않는 유저 ID면 NotFoundError를 반환한다")
     void updateUserDrinkHistory_NotFoundUserId_returnsNotFoundError() {
         var userProfileVisitVisibility = _fixtureMonkey.giveMeOne(UserProfileVisitVisibility.class);
         var userId = _fixtureMonkey.giveMeOne(Long.class);
@@ -191,11 +192,11 @@ class UserServiceImplTest {
         assertInstanceOf(NotFoundError.class, result.getErrors().get(0), "에러는 NotFoundError 이어야 한다.");
     }
 
-    /// NotFoundError 찾을수 없는 아이디<br/>
+    /// NotFoundError 찾을수 없는 아이디
     /// {@return UserModel}
-    //Result<UserModel> findUserById(String userId);
     //유저 찾기 성공
     @Test
+    @DisplayName("로그인 아이디로 유저 조회 성공 - 존재하는 loginId면 UserModel을 반환한다")
     void findUserByLoginId_success() {
         var userLoginId = _fixtureMonkey.giveMeOne(String.class);
         var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
@@ -211,6 +212,7 @@ class UserServiceImplTest {
 
     //유저 찾기 실패 -> id를 찾을수 없음
     @Test
+    @DisplayName("로그인 아이디로 유저 조회 실패 - 존재하지 않는 loginId면 NotFoundError를 반환한다")
     void findUserByLoginId_NotFoundUserId_returnsNotFoundError() {
         var userLoginId = _fixtureMonkey.giveMeOne(String.class);
         var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
@@ -228,6 +230,7 @@ class UserServiceImplTest {
 
     //유저 찾기 성공
     @Test
+    @DisplayName("ID로 유저 조회 성공 - 존재하는 UserId면 UserModel을 반환한다")
     void findUserById_success() {
         var userId = _fixtureMonkey.giveMeOne(Long.class);
         var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
@@ -243,11 +246,11 @@ class UserServiceImplTest {
 
     //유저 찾기 실패 -> id를 찾을수 없음
     @Test
+    @DisplayName("ID로 유저 조회 실패 - 존재하지 않는 UserId면 NotFoundError를 반환한다")
     void findUserById_NotFoundUserId_returnsNotFoundError() {
         var userId = _fixtureMonkey.giveMeOne(Long.class);
         var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
         userModel.setId(userId);
-
 
         when(_userRepository.findById(userId)).thenReturn(Optional.empty());
 
@@ -259,12 +262,10 @@ class UserServiceImplTest {
         assertInstanceOf(NotFoundError.class, result.getErrors().get(0), "에러는 NotFoundError 이어야 한다.");
     }
 
-    /// FR2	사용자는 아이디와 비밀번호로 로그인 및 로그아웃을 할 수 있어야 한다. <br/>
-    /// NotFoundError 아이디 또는 비밀번호가 틀렸을때 <br/>
-    /// {@return UserID} <br/>
-    /// Result<Long> LoginUser(LoginUserCommand command);
+    /// FR2 로그인
     //로그인 성공
     @Test
+    @DisplayName("로그인 성공 - 아이디와 비밀번호가 일치하면 UserId를 반환한다")
     void LoginUser_success() {
         var command = _fixtureMonkey.giveMeOne(LoginUserCommand.class);
         var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
@@ -282,6 +283,7 @@ class UserServiceImplTest {
 
     //로그인 실패 - 아이디가 없음
     @Test
+    @DisplayName("로그인 실패 - 존재하지 않는 로그인 아이디면 NotFoundError를 반환한다")
     void LoginUser_NotFoundUserId_returnsNotFoundError() {
         var command = _fixtureMonkey.giveMeOne(LoginUserCommand.class);
         var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
@@ -299,6 +301,7 @@ class UserServiceImplTest {
 
     //로그인 실패 - 비밀번호가 틀림
     @Test
+    @DisplayName("로그인 실패 - 비밀번호가 일치하지 않으면 NotFoundError를 반환한다")
     void LoginUser_NotFoundPassword_returnsNotFoundError() {
         var command = _fixtureMonkey.giveMeOne(LoginUserCommand.class);
         var userModel = _fixtureMonkey.giveMeOne(UserModel.class);
