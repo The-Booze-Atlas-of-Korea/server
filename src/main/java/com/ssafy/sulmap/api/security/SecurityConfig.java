@@ -1,7 +1,6 @@
-package com.ssafy.sulmap.api.config;
+package com.ssafy.sulmap.api.security;
 
-import com.ssafy.sulmap.api.dto.LoginUserDetail;
-import com.ssafy.sulmap.core.model.UserModel;
+import com.ssafy.sulmap.api.security.model.UserDetail;
 import com.ssafy.sulmap.core.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -52,7 +51,7 @@ public class SecurityConfig {
         return username -> {
             // username = loginId
             var findUserResult = userService.findUserByLoginId(username);
-            return new LoginUserDetail(findUserResult.getOrThrow(
+            return new UserDetail(findUserResult.getOrThrow(
                     new UsernameNotFoundException("User not found: " + username)));
         };
     }

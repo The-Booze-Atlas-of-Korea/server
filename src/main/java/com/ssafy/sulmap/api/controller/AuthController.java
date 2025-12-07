@@ -1,9 +1,7 @@
 package com.ssafy.sulmap.api.controller;
 
-import com.ssafy.sulmap.api.dto.LoginUserDetail;
 import com.ssafy.sulmap.api.dto.request.LoginRequest;
 import com.ssafy.sulmap.api.dto.request.SignupRequest;
-import com.ssafy.sulmap.core.model.UserModel;
 import com.ssafy.sulmap.core.model.command.CreateUserCommand;
 import com.ssafy.sulmap.core.model.enums.UserGender;
 import com.ssafy.sulmap.core.service.UserService;
@@ -11,8 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

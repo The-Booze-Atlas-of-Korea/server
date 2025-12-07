@@ -1,21 +1,20 @@
 package com.ssafy.sulmap.api.controller;
 
-import com.ssafy.sulmap.api.dto.LoginUserDetail;
+import com.ssafy.sulmap.api.security.model.UserDetail;
 import com.ssafy.sulmap.api.dto.request.UpdateUserRequest;
 import com.ssafy.sulmap.api.dto.response.GetUserResponse;
-import com.ssafy.sulmap.core.model.UserModel;
 import com.ssafy.sulmap.core.model.command.UpdateUserProfileCommand;
 import com.ssafy.sulmap.core.model.enums.UserGender;
 import com.ssafy.sulmap.core.service.UserService;
-import com.ssafy.sulmap.share.result.Result;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import static com.ssafy.sulmap.api.security.SecurityUtils.getrefreshedAuthentication;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,16 +23,16 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("me")
-    public ResponseEntity<?> getUser(@AuthenticationPrincipal LoginUserDetail userDetail) throws Exception
+    public ResponseEntity<?> getUser(@AuthenticationPrincipal UserDetail userDetail) throws Exception
     {
-        return ResponseEntity.ok(GetUserResponse.fromModel(userDetail.getUserModel()));
+        return ResponseEntity.ok(GetUserResponse.fromModel(userDetail.userModel()));
     }
 
     @PatchMapping("me")
     public ResponseEntity<?> updateUserProfile(@Valid UpdateUserRequest updateUserRequest,
-                                        @AuthenticationPrincipal LoginUserDetail userDetail) throws Exception
+                                        @AuthenticationPrincipal UserDetail userDetail) throws Exception
     {
-        var userId = userDetail.getUserModel().getId();
+        var userId = userDetail.userModel().getId();
         var command = UpdateUserProfileCommand.builder()
                 .userId(userId)
                 .name(updateUserRequest.name())
@@ -51,7 +50,8 @@ public class UserController {
         }
 
         var refreshedUserResult = userService.findUserById(userId);
-        Authentication newAuth = getAuthentication(refreshedUserResult);
+        var userModel = refreshedUserResult.getOrThrow();
+        Authentication newAuth = getrefreshedAuthentication(userModel);
         SecurityContextHolder.getContext().setAuthentication(newAuth);
         // HttpSession에 저장은 SecurityFilterChain이 요청 끝나면서 자동으로 해줌
 
@@ -59,9 +59,9 @@ public class UserController {
     }
 
     @DeleteMapping("me")
-    public ResponseEntity<?> deleteUser(@AuthenticationPrincipal LoginUserDetail userDetail) throws Exception
+    public ResponseEntity<?> deleteUser(@AuthenticationPrincipal UserDetail userDetail) throws Exception
     {
-        var userId = userDetail.getUserModel().getId();
+        var userId = userDetail.userModel().getId();
         var deleteResult = userService.softDeleteUser(userId);
 
         if(deleteResult.isFailure()){
@@ -83,17 +83,4 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-
-    private static Authentication getAuthentication(Result<UserModel> refreshedUserResult) {
-        var refreshedUser = refreshedUserResult.getOrThrow();
-        LoginUserDetail newPrincipal = new LoginUserDetail(refreshedUser);
-        Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
-
-        //  새 Authentication 만들기 (principal만 교체, credentials/authorities 유지)
-        return new UsernamePasswordAuthenticationToken(
-                newPrincipal,
-                currentAuth.getCredentials(),
-                currentAuth.getAuthorities()
-        );
-    }
 }

@@ -1,20 +1,14 @@
-package com.ssafy.sulmap.api.dto;
+package com.ssafy.sulmap.api.security.model;
 
 import com.ssafy.sulmap.core.model.UserModel;
 import com.ssafy.sulmap.core.model.enums.UserStatus;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
 
-@Getter
-@RequiredArgsConstructor
-public class LoginUserDetail implements UserDetails {
-    private final UserModel userModel;
-
+public record UserDetail(UserModel userModel) implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // 권한 시스템 사용 시 여기에 매핑
