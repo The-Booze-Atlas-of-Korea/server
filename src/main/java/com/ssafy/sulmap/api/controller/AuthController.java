@@ -9,6 +9,7 @@ import com.ssafy.sulmap.core.model.enums.UserGender;
 import com.ssafy.sulmap.core.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -38,7 +39,7 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(
-            @RequestBody LoginRequest request,
+            @Valid @RequestBody LoginRequest request,
             HttpServletRequest httpRequest
     ) {
         // 1) AuthenticationManager 에게 인증 위임
@@ -65,7 +66,7 @@ public class AuthController {
      * 비밀번호 암호화는 UserService 내부에서 passwordEncoder 사용
      */
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody SignupRequest request) {
+    public ResponseEntity<?> signup(@Valid @RequestBody SignupRequest request) {
         var command = CreateUserCommand.builder()
                 .loginId(request.loginId())
                 .password(request.password())
