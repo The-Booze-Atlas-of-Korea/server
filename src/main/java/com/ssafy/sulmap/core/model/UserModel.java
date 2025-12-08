@@ -1,22 +1,34 @@
 package com.ssafy.sulmap.core.model;
 
+import com.ssafy.sulmap.core.model.enums.UserAuthProvider;
+import com.ssafy.sulmap.core.model.enums.UserGender;
+import com.ssafy.sulmap.core.model.enums.UserProfileVisitVisibility;
+import com.ssafy.sulmap.core.model.enums.UserStatus;
 import lombok.*;
 
 import java.util.Date;
 
-@Getter
+@Data
 @Builder
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserModel {
-    String loginId;
-    String password;
-    String name;
-    String phone;
-    String email;
-    Date birth;
-    String address;
-    String gender;
-    String profile_image_url;
+    private Long id;
+    private String loginId;
+    private String passwordHash;
+    private String name;
+    private String email;
+    private String phone;
+    private String address;
+    private Date birthday;
+    private UserGender gender;
+    private String profileImageUrl;
+    private UserAuthProvider authProvider;
+    private String providerId;
+    private UserStatus status;
+    private UserProfileVisitVisibility visitVisibilitySetting; //공개여부
+    private Date createdAt;
+    private Date updatedAt;
+    private Date deletedAt;
+    private Date lastLoginAt;
 }

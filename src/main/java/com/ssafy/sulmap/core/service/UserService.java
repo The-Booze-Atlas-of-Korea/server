@@ -1,34 +1,49 @@
 package com.ssafy.sulmap.core.service;
 
-import com.ssafy.sulmap.core.model.MemberDrinkHistoryOpen;
 import com.ssafy.sulmap.core.model.UserModel;
-import com.ssafy.sulmap.core.model.UserUpdateModel;
+import com.ssafy.sulmap.core.model.command.CreateUserCommand;
+import com.ssafy.sulmap.core.model.command.LoginUserCommand;
+import com.ssafy.sulmap.core.model.command.UpdateUserProfileCommand;
+import com.ssafy.sulmap.core.model.enums.UserProfileVisitVisibility;
 import com.ssafy.sulmap.share.result.Result;
-
-import java.util.Date;
 
 public interface UserService {
     /// FR1	사용자는 이름, 전화번호, 이메일, 생년월일, 주소, 성별을 입력해 회원가입을 할 수 있어야 한다.<br/>
     /// ConflictError 중복되는 아이디<br/>
     /// {@return UserID}
-    Result<Long> registerUser(UserModel userModel);
+    Result<Long> CreateUser(CreateUserCommand command);
     /// FR6	사용자는 자신의 프로필 정보(이름, 전화번호, 이메일, 주소 등)를 수정할 수 있어야 한다.<br/>
     /// NotFoundError 찾을수 없는 아이디<br/>
     /// {@return UserID}
-    Result<Long> updateUser(long userId, UserUpdateModel userUpdateModel);
+    Result<Long> updateUserProfile(UpdateUserProfileCommand command);
+
+    /// FR2	사용자는 아이디와 비밀번호로 로그인 및 로그아웃을 할 수 있어야 한다. <br/>
+    /// NotFoundError 아이디 또는 비밀번호가 틀렸을때 <br/>
+    /// {@return UserID}
+    Result<Long> LoginUser(LoginUserCommand command);
 
     /// FR7	사용자는 언제든지 계정을 탈퇴(삭제)할 수 있어야 하며, 관련 정책에 따라 데이터가 익명화 또는 삭제 처리되어야 한다.<br/>
     /// NotFoundError 찾을수 없는 아이디<br/>
-    Result deleteUser(long userId);
+    Result<Long> softDeleteUser(long userId);
 
     /// FR19 사용자는 자신의 술자리 이력·방문 기록의 공개 범위(전체 공개 / 친구만 / 비공개)를 설정할 수 있어야 한다.<br/>
     /// NotFoundError 찾을수 없는 아이디<br/>
     /// {@return UserID}
-    Result<Long> updateUserDrinkHistory(long userId, MemberDrinkHistoryOpen historyOpen);
+    Result<Long> updateUserProfileVisitVisibility(long userId, UserProfileVisitVisibility visibility);
 
+    /// user Login id 를 통해서 아이디 찾기<br/>
     /// NotFoundError 찾을수 없는 아이디<br/>
     /// {@return UserModel}
-    Result<UserModel> findUserById(String userId);
+    Result<UserModel> findUserByLoginId(String userLoginId);
 
+    /// user id 를 통해서 아이디 찾기<br/>
+    /// NotFoundError 찾을수 없는 아이디<br/>
+    /// {@return UserModel}
+    Result<UserModel> findUserById(Long userId);
 
+    /// 유저가 다른 유저의 프로필을 보기위해 모델을 불려올때 <br>
+    /// NotFoundError 찾을수 없는 아이디<br/>
+    /// conflict 프로필이 비공개 일때<br/>
+    /// {@return UserModel}
+    Result<UserModel> findUserByIdForViewer(Long userId);
 }

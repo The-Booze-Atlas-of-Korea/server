@@ -29,7 +29,9 @@
         auth_provider, provider_id, status, visit_visibility_setting, last_login_at, created_at, updated_at, deleted_at
     </sql>
 
-    <select id="selectById" parameterType="long" resultMap="UserResultMap">
+    <select id="selectById"
+            parameterType="long"
+            resultMap="UserResultMap">
         SELECT
         <include refid="BaseColumns"/>
         FROM users
@@ -37,7 +39,9 @@
         AND deleted_at IS NULL
     </select>
 
-    <select id="selectByLoginId" parameterType="string" resultMap="UserResultMap">
+    <select id="selectByLoginId"
+            parameterType="string"
+            resultMap="UserResultMap">
         SELECT
         <include refid="BaseColumns"/>
         FROM users
@@ -45,18 +49,24 @@
         AND deleted_at IS NULL
     </select>
 
-    <insert id="insert" parameterType="com.ssafy.sulmap.infra.model.UserEntity" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+    <insert id="insert"
+            parameterType="com.ssafy.sulmap.infra.model.UserEntity"
+            useGeneratedKeys="true"
+            keyProperty="id"
+            keyColumn="id">
         INSERT INTO users (login_id, password_hash, name, phone, email, birth_date, address, gender,
                            profile_image_url, auth_provider, provider_id, status, visit_visibility_setting,
                            last_login_at, created_at, updated_at, deleted_at)
         VALUES (#{loginId}, #{passwordHash}, #{name}, #{phone}, #{email}, #{birthDate}, #{address}, #{gender},
                 #{profileImageUrl}, #{authProvider}, #{providerId}, #{status}, #{visitVisibilitySetting},
-                #{lastLoginAt}, #{createdAt}, #{updatedAt}, #{deletedAt})
+                #{lastLoginAt}, NOW(), NOW(), null)
     </insert>
 
     <update id="update" parameterType="com.ssafy.sulmap.infra.model.UserEntity">
         UPDATE users
         <set>
+            <if test="loginId != null">login_id = #{loginId},</if>
+            <if test="passwordHash != null">password_hash = #{passwordHash},</if>
             <if test="name != null">name = #{name},</if>
             <if test="email != null">email = #{email},</if>
             <if test="phone != null">phone = #{phone},</if>
@@ -66,32 +76,13 @@
             <if test="profileImageUrl != null">profile_image_url = #{profileImageUrl},</if>
             <if test="status != null">status = #{status},</if>
             <if test="visitVisibilitySetting != null">visit_visibility_setting = #{visitVisibilitySetting},</if>
-            <if test="passwordHash != null">password_hash = #{passwordHash},</if>
+            <if test="deletedAt != null">deleted_at = #{deletedAt},</if>
+            <if test="lastLoginAt != null">last_login_at = #{lastLoginAt},</if>
             updated_at = NOW()
         </set>
+
         WHERE id = #{id}
         AND deleted_at IS NULL
     </update>
 
-    <update id="updateLastLoginAt">
-        UPDATE users
-        SET last_login_at = #{lastLoginAt},
-            updated_at = NOW()
-        WHERE id = #{id}
-          AND deleted_at IS NULL
-    </update>
-
-    <update id="softDelete" parameterType="long">
-        UPDATE users
-        SET deleted_at = NOW(),
-            updated_at = NOW()
-        WHERE id = #{id}
-          AND deleted_at IS NULL
-    </update>
-
-    <select id="existsByLoginId" parameterType="string" resultType="boolean">
-        SELECT EXISTS(
-            SELECT 1 FROM users WHERE login_id = #{loginId} AND deleted_at IS NULL
-        )
-    </select>
 </mapper>

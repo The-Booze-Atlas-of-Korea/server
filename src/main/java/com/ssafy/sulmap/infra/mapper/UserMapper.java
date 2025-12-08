@@ -11,7 +11,4 @@ public interface UserMapper {
     UserEntity selectByLoginId(@Param("loginId") String loginId);
     int insert(UserEntity entity);
     int update(UserEntity entity);
-    int softDelete(@Param("id") Long id);
-    boolean existsByLoginId(@Param("loginId") String loginId);
-    int updateLastLoginAt(@Param("id") Long id, @Param("lastLogin") Date lastLogin);
 }
