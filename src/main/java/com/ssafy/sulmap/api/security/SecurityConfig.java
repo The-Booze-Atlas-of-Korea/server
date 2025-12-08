@@ -57,12 +57,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        // 회원가입 서비스에서 passwordEncoder.encode() 사용해서 저장
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider(
             UserDetailsService userDetailsService,
             PasswordEncoder passwordEncoder
@@ -98,6 +92,7 @@ public class SecurityConfig {
                         .requestMatchers("/auth/login", "/auth/signup").permitAll()
                         .requestMatchers(HttpMethod.GET, "/health", "/docs/**").permitAll()
                         .requestMatchers(_SWAGGER_WHITELIST).permitAll()
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
 

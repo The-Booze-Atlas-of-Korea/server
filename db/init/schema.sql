@@ -37,7 +37,6 @@ CREATE TABLE users (
                        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                        deleted_at DATETIME NULL,
 
-                       UNIQUE KEY uk_users_email (email),      -- 이메일 기준 중복 방지
                        UNIQUE KEY uk_users_provider (auth_provider, provider_id),  -- 동일 provider+id 중복 방지
                        INDEX idx_users_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

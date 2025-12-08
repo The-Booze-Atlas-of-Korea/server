@@ -24,7 +24,7 @@ public class UserEntity {
     private String email;
     private String phone;
     private String address;
-    private Date birthday;
+    private Date birthDate;
     private String gender;
     private String profileImageUrl;
     private String authProvider;
@@ -38,7 +38,7 @@ public class UserEntity {
 
 
     public static UserEntity fromUserModel(UserModel userModel) {
-        return UserEntity.builder()
+        var builder = UserEntity.builder()
                 .id(userModel.getId())
                 .loginId(userModel.getLoginId())
                 .passwordHash(userModel.getPasswordHash())
@@ -46,18 +46,18 @@ public class UserEntity {
                 .email(userModel.getEmail())
                 .phone(userModel.getPhone())
                 .address(userModel.getAddress())
-                .birthday(userModel.getBirthday())
+                .birthDate(userModel.getBirthday())
                 .gender(userModel.getGender().toString())
                 .profileImageUrl(userModel.getProfileImageUrl())
-                .authProvider(userModel.getAuthProvider().toString())
+                .authProvider(userModel.getAuthProvider()==null ? UserAuthProvider.LOCAL.toString() : userModel.getAuthProvider().toString())
                 .providerId(userModel.getProviderId())
-                .status(userModel.getStatus().toString())
-                .visitVisibilitySetting(userModel.getVisitVisibilitySetting().toString())
+                .status(userModel.getStatus() == null ? UserStatus.ACTIVE.toString() : userModel.getStatus().toString())
+                .visitVisibilitySetting(userModel.getVisitVisibilitySetting() == null ? UserProfileVisitVisibility.PUBLIC.toString() : userModel.getVisitVisibilitySetting().toString())
                 .createdAt(userModel.getCreatedAt())
                 .updatedAt(userModel.getUpdatedAt())
                 .deletedAt(userModel.getDeletedAt())
-                .lastLoginAt(userModel.getLastLoginAt())
-                .build();
+                .lastLoginAt(userModel.getLastLoginAt());
+        return builder.build();
     }
 
     public UserModel toUserModel() {
@@ -69,7 +69,7 @@ public class UserEntity {
                 .email(email)
                 .phone(phone)
                 .address(address)
-                .birthday(birthday)
+                .birthday(birthDate)
                 .gender(UserGender.fromString(gender))
                 .profileImageUrl(profileImageUrl)
                 .authProvider(UserAuthProvider.fromValue(authProvider))
