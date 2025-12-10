@@ -71,7 +71,7 @@ public class AuthController {
                 .phone(request.phone())
                 .address(request.address())
                 .birthday(request.birthday())
-                .gender(UserGender.fromString(request.Gender()))
+                .gender(UserGender.fromString(request.gender()))
                 .build();
 
         // 예시: 서비스에서 안에서 passwordEncoder.encode() 처리

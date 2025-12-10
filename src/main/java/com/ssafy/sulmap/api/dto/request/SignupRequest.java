@@ -1,7 +1,5 @@
 package com.ssafy.sulmap.api.dto.request;
 
-import com.ssafy.sulmap.core.model.enums.UserGender;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
 import java.util.Date;
@@ -50,6 +48,6 @@ public record SignupRequest(
                 regexp = "^(M|F|OTHER|UNKNOWN)$",
                 message = "성별은 M, F, OTHER, UNKNOWN 중 하나여야 합니다."
         )
-        String Gender
+        String gender
 ) {
 }
