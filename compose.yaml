@@ -3,11 +3,14 @@ services:
     image: 'mysql:latest'
     environment:
       - 'MYSQL_DATABASE=sulmap'
-      - 'MYSQL_PASSWORD=secret'
-      - 'MYSQL_ROOT_PASSWORD=verysecret'
-      - 'MYSQL_USER=myuser'
+      - 'MYSQL_PASSWORD=ssafy'
+      - 'MYSQL_ROOT_PASSWORD=ssafy'
+      - 'MYSQL_USER=ssafy'
     ports:
       - '33060:3306'
     volumes:
       - 'db-data:/var/lib/mysql'
       - './db/init:/docker-entrypoint-initdb.d'
+
+volumes :
+  db-data:
