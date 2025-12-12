@@ -1,6 +1,6 @@
 package com.ssafy.sulmap.core.model;
 
-import com.ssafy.sulmap.core.enums.PlanTheme;
+import com.ssafy.sulmap.core.model.enums.PlanTheme;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
