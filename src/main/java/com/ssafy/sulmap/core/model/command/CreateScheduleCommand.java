@@ -4,10 +4,9 @@ import com.ssafy.sulmap.core.model.enums.ScheduleStatus;
 import java.time.LocalDateTime;
 
 public record CreateScheduleCommand(
-        Long scheduleId,
-        Long userId, // For ownership check
+        Long ownerUserId,
+        Long planId, // Nullable
         String scheduleTitle,
-        LocalDateTime meetAt,
-        ScheduleStatus status
-) {
+        LocalDateTime meetAt) {
 }
+
