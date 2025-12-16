@@ -5,11 +5,11 @@ import com.ssafy.sulmap.core.model.command.CreatePlanCommand;
 import com.ssafy.sulmap.core.model.command.UpdatePlanCommand;
 import com.ssafy.sulmap.core.repository.PlanRepository;
 import com.ssafy.sulmap.core.service.PlanService;
-import java.time.LocalDateTime;
+import com.ssafy.sulmap.share.result.Result;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -18,8 +18,7 @@ public class PlanServiceImpl implements PlanService {
     private final PlanRepository _planRepository;
 
     @Override
-    @Transactional
-    public DrinkingPlanModel createPlan(CreatePlanCommand command) {
+    public Result<DrinkingPlanModel> createPlan(CreatePlanCommand command) {
         DrinkingPlanModel plan = DrinkingPlanModel.builder()
                 .ownerUserId(command.ownerUserId())
                 .title(command.title())
@@ -30,29 +29,34 @@ public class PlanServiceImpl implements PlanService {
                 .updatedAt(LocalDateTime.now())
                 .spots(command.spots())
                 .build();
-        return _planRepository.save(plan);
+
+        DrinkingPlanModel savedPlan = _planRepository.save(plan);
+        return Result.ok(savedPlan);
     }
 
     @Override
-    @Transactional
-    public DrinkingPlanModel updatePlan(UpdatePlanCommand command) {
-        DrinkingPlanModel plan = _planRepository.findById(command.planId())
-                .orElseThrow(() -> new IllegalArgumentException("Plan not found"));
+    public Result<DrinkingPlanModel> updatePlan(UpdatePlanCommand command) {
+        return _planRepository.findById(command.planId())
+                .map(plan -> {
+                    // 소유권 확인
+                    if (!plan.getOwnerUserId().equals(command.userId())) {
+                        return Result.<DrinkingPlanModel>fail(403, "플랜 수정 권한이 없습니다");
+                    }
 
-        if (!plan.getOwnerUserId().equals(command.userId())) {
-            throw new IllegalStateException("Only owner can update the plan");
-        }
+                    // 플랜 업데이트
+                    plan.update(command.title(), command.description(), command.theme(), command.totalBudget());
+                    plan.setSpots(command.spots());
 
-        plan.update(command.title(), command.description(), command.theme(), command.totalBudget());
-        plan.setSpots(command.spots()); // Full replacement of spots
-
-        return _planRepository.save(plan);
+                    DrinkingPlanModel updatedPlan = _planRepository.save(plan);
+                    return Result.ok(updatedPlan);
+                })
+                .orElse(Result.fail(404, "플랜을 찾을 수 없습니다"));
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public DrinkingPlanModel getPlan(Long planId) {
+    public Result<DrinkingPlanModel> getPlan(Long planId) {
         return _planRepository.findById(planId)
-                .orElseThrow(() -> new IllegalArgumentException("Plan not found"));
+                .map(Result::ok)
+                .orElse(Result.fail(404, "플랜을 찾을 수 없습니다"));
     }
 }
