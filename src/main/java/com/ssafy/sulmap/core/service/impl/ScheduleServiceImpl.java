@@ -1,26 +1,27 @@
 package com.ssafy.sulmap.core.service.impl;
 
+import com.ssafy.sulmap.core.model.enums.ScheduleStatus;
 import com.ssafy.sulmap.core.model.DrinkingScheduleModel;
 import com.ssafy.sulmap.core.model.command.CreateScheduleCommand;
 import com.ssafy.sulmap.core.model.command.UpdateScheduleCommand;
-import com.ssafy.sulmap.core.model.enums.ScheduleStatus;
 import com.ssafy.sulmap.core.model.query.GetSchedulesInPeriodQuery;
 import com.ssafy.sulmap.core.repository.ScheduleRepository;
 import com.ssafy.sulmap.core.service.ScheduleService;
+import com.ssafy.sulmap.share.result.Result;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class ScheduleServiceImpl implements ScheduleService {
-    private final ScheduleRepository scheduleRepository;
+
+    private final ScheduleRepository _scheduleRepository;
+
     @Override
-    @Transactional
-    public DrinkingScheduleModel createSchedule(CreateScheduleCommand command) {
+    public Result<DrinkingScheduleModel> createSchedule(CreateScheduleCommand command) {
         DrinkingScheduleModel schedule = DrinkingScheduleModel.builder()
                 .ownerUserId(command.ownerUserId())
                 .planId(command.planId())
@@ -30,37 +31,45 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-        return scheduleRepository.save(schedule);
+
+        DrinkingScheduleModel savedSchedule = _scheduleRepository.save(schedule);
+        return Result.ok(savedSchedule);
     }
 
     @Override
-    @Transactional
-    public DrinkingScheduleModel updateSchedule(UpdateScheduleCommand command) {
-        DrinkingScheduleModel schedule = scheduleRepository.findById(command.scheduleId())
-                .orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
+    public Result<DrinkingScheduleModel> updateSchedule(UpdateScheduleCommand command) {
+        return _scheduleRepository.findById(command.scheduleId())
+                .map(schedule -> {
+                    // 소유권 확인
+                    if (!schedule.getOwnerUserId().equals(command.userId())) {
+                        return Result.<DrinkingScheduleModel>fail(403, "일정 수정 권한이 없습니다");
+                    }
 
-        if (!schedule.getOwnerUserId().equals(command.userId())) {
-            throw new IllegalStateException("Only owner can update the schedule");
-        }
+                    // 일정 업데이트
+                    schedule.reschedule(command.meetAt(), command.scheduleTitle());
+                    if (command.status() != null) {
+                        schedule.changeStatus(command.status());
+                    }
 
-        schedule.reschedule(command.meetAt(), command.scheduleTitle());
-        if (command.status() != null) {
-            schedule.changeStatus(command.status());
-        }
-
-        return scheduleRepository.save(schedule);
+                    DrinkingScheduleModel updatedSchedule = _scheduleRepository.save(schedule);
+                    return Result.ok(updatedSchedule);
+                })
+                .orElse(Result.fail(404, "일정을 찾을 수 없습니다"));
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public DrinkingScheduleModel getSchedule(Long scheduleId) {
-        return scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new IllegalArgumentException("Schedule not found"));
+    public Result<DrinkingScheduleModel> getSchedule(Long scheduleId) {
+        return _scheduleRepository.findById(scheduleId)
+                .map(Result::ok)
+                .orElse(Result.fail(404, "일정을 찾을 수 없습니다"));
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<DrinkingScheduleModel> getSchedulesInPeriod(GetSchedulesInPeriodQuery query) {
-        return scheduleRepository.findByPeriod(query.userId(), query.startDate(), query.endDate());
+    public Result<List<DrinkingScheduleModel>> getSchedulesInPeriod(GetSchedulesInPeriodQuery query) {
+        List<DrinkingScheduleModel> schedules = _scheduleRepository.findByPeriod(
+                query.userId(),
+                query.startDate(),
+                query.endDate());
+        return Result.ok(schedules);
     }
 }
