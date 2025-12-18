@@ -1,6 +1,6 @@
 CREATE TABLE bars
 (
-    id                 BIGINT PRIMARY KEY AUTO_INCREMENT,
+    id                 BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     name               VARCHAR(100)   NOT NULL,
     address            VARCHAR(255)   NOT NULL,
     latitude           DECIMAL(10, 7) NOT NULL,

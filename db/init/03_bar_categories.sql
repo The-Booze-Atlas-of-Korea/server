@@ -1,6 +1,6 @@
 CREATE TABLE bar_categories
 (
-    id         BIGINT PRIMARY KEY AUTO_INCREMENT,
+    id         BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
     name       VARCHAR(50) NOT NULL,
     group_name VARCHAR(50) NULL,
 

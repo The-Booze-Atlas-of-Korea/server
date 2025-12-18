@@ -1,8 +1,8 @@
 CREATE TABLE bar_category_mapping
 (
-    id          BIGINT PRIMARY KEY AUTO_INCREMENT,
-    bar_id      BIGINT   NOT NULL,
-    category_id BIGINT   NOT NULL,
+    id          BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    bar_id      BIGINT UNSIGNED   NOT NULL,
+    category_id BIGINT UNSIGNED   NOT NULL,
     priority    INT NULL,
 
     created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
