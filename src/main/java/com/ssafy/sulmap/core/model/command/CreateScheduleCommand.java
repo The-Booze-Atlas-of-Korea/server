@@ -1,12 +1,13 @@
 package com.ssafy.sulmap.core.model.command;
 
-import com.ssafy.sulmap.core.model.enums.ScheduleStatus;
+import lombok.Builder;
+
 import java.time.LocalDateTime;
 
+@Builder
 public record CreateScheduleCommand(
-        Long ownerUserId,
-        Long planId, // Nullable
-        String scheduleTitle,
-        LocalDateTime meetAt) {
+                Long ownerUserId,
+                Long planId, // Nullable
+                String scheduleTitle,
+                LocalDateTime meetAt) {
 }
-
