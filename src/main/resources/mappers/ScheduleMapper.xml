@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.sulmap.infra.mapper.ScheduleMapper">
+
+    <!-- DrinkingScheduleEntity ResultMap -->
+    <resultMap id="ScheduleResultMap" type="com.ssafy.sulmap.infra.model.DrinkingScheduleEntity">
+        <id property="id" column="id"/>
+        <result property="ownerUserId" column="owner_user_id"/>
+        <result property="planId" column="plan_id"/>
+        <result property="scheduleTitle" column="schedule_title"/>
+        <result property="meetAt" column="meet_at"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- 일정 삽입 -->
+    <insert id="insert" parameterType="com.ssafy.sulmap.infra.model.DrinkingScheduleEntity"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO drinking_schedule (owner_user_id, plan_id, schedule_title, meet_at, status, created_at, updated_at)
+        VALUES (#{ownerUserId}, #{planId}, #{scheduleTitle}, #{meetAt}, #{status}, #{createdAt}, #{updatedAt})
+    </insert>
+
+    <!-- 일정 단건 조회 -->
+    <select id="selectById" parameterType="long" resultMap="ScheduleResultMap">
+        SELECT id, owner_user_id, plan_id, schedule_title, meet_at, status, created_at, updated_at
+        FROM drinking_schedule
+        WHERE id = #{id}
+    </select>
+
+    <!-- 기간별 일정 조회 -->
+    <select id="selectByPeriod" resultMap="ScheduleResultMap">
+        SELECT id, owner_user_id, plan_id, schedule_title, meet_at, status, created_at, updated_at
+        FROM drinking_schedule
+        WHERE owner_user_id = #{userId}
+          AND meet_at BETWEEN #{startDate} AND #{endDate}
+        ORDER BY meet_at ASC
+    </select>
+
+    <!-- 일정 수정 -->
+    <update id="update" parameterType="com.ssafy.sulmap.infra.model.DrinkingScheduleEntity">
+        UPDATE drinking_schedule
+        <set>
+            <if test="scheduleTitle != null">schedule_title = #{scheduleTitle},</if>
+            <if test="meetAt != null">meet_at = #{meetAt},</if>
+            <if test="status != null">status = #{status},</if>
+            updated_at = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+</mapper>
