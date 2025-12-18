@@ -1,5 +1,5 @@
 CREATE DATABASE IF NOT EXISTS sulmap
-  DEFAULT CHARACTER SET utf8mb4
-  DEFAULT COLLATE utf8mb4_general_ci;
+    DEFAULT CHARACTER SET utf8mb4
+    DEFAULT COLLATE utf8mb4_general_ci;
 
 USE sulmap;
