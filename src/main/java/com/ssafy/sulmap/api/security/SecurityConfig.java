@@ -20,6 +20,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Configuration
@@ -75,7 +80,7 @@ public class SecurityConfig {
         http
                 // REST API + 세션/쿠키. CSRF는 프론트/운영 환경에 맞게 나중에 켜는 걸 추천
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
                 // 세션 기반 인증
                 .sessionManagement(session -> session
@@ -106,6 +111,29 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider);
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        // 프론트 주소를 정확히 적어야 함 (지금 에러에 나온 5173)
+        config.setAllowedOrigins(List.of("http://localhost:5173"));
+
+        // 사용하는 메소드들
+        config.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
+
+        // 헤더들
+        config.setAllowedHeaders(List.of("*"));
+
+        // 세션/쿠키 쓸 거면 true
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // 필요한 경로만 좁히고 싶으면 "/api/**" 로
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
     }
 
     /**
