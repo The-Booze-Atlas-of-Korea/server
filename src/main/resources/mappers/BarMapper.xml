@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.sulmap.infra.mapper.BarMapper">
+
+    <resultMap id="BarResultMap" type="com.ssafy.sulmap.infra.model.BarEntity">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="address" column="address"/>
+        <result property="latitude" column="latitude"/>
+        <result property="longitude" column="longitude"/>
+        <result property="baseCategoryName" column="base_category_name"/>
+        <result property="openInformation" column="open_information"/>
+        <result property="menuJsonString" column="menu"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="deletedAt" column="deleted_at"/>
+    </resultMap>
+
+    <select id="selectById"
+            parameterType="long"
+            resultMap="BarResultMap">
+        SELECT
+            id, name, address, latitude, longitude, base_category_name, open_information, menu, created_at, updated_at, deleted_at
+        FROM bars
+        WHERE id = #{id}
+        AND deleted_at IS NULL
+    </select>
+</mapper>
