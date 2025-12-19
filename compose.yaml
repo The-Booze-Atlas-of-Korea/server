@@ -12,5 +12,28 @@ services:
       - 'db-data:/var/lib/mysql'
       - './db/init:/docker-entrypoint-initdb.d'
 
-volumes :
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
+    container_name: es
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false         # 테스트용
+    ports:
+      - "9200:9200"
+
+  es-init:
+    image: curlimages/curl:latest
+    depends_on:
+      - elasticsearch
+    volumes:
+      - ./es/init:/init
+    entrypoint: ["/bin/sh", "/init/es_init.sh"]
+    environment:
+      - ES_URL=http://elasticsearch:9200
+      - INDEX_NAME=bars
+      - INDEX_JSON_PATH=/init/index_bars.json
+      - SEED_NDJSON_PATH=/init/bars_seed.ndjson
+
+
+volumes:
   db-data:
