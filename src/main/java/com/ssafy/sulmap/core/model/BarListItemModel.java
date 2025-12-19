@@ -19,7 +19,7 @@ public class BarListItemModel {
     private Double latitude;
     private Double longitude;
     private String baseCategoryName;
-    private String open_information;
+    private String openInformation;
     private Date createdAt;
     private Date updatedAt;
     private Date deletedAt;
