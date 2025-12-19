@@ -1,7 +1,6 @@
 package com.ssafy.sulmap.core.model.query;
 
 public record NearbyBarsQuery(
-        long user_id,
         double latitude,
         double longitude,
         int radiusMeters,
