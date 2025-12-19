@@ -21,8 +21,6 @@ public class BarModel {
     private String baseCategoryName;
     private List<String> menus;
     private List<BarCategoryModel> categories;
-    private List<ReviewModel> reviews;
-    private List<MemoModel> memos;
     private String open_information;
     private Date createdAt;
     private Date updatedAt;
