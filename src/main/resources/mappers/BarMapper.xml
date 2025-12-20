@@ -45,7 +45,7 @@
                category.created_at AS created_at,
                category.updated_at AS updated_at,
                category.deleted_at AS deleted_at,
-               map.priority        AS priority,
+               map.priority        AS priority
         FROM bar_category_mapping AS map
                  JOIN bar_categories AS category
                       ON map.category_id = category.id

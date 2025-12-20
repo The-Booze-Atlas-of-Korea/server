@@ -26,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -79,7 +80,7 @@ class BarServiceImplTest {
     //현재 위치 기준으로 주변 술집 검색
     @Test
     @DisplayName("현재 위치 기준으로 주변 술집 검색 성공")
-    void findUserByIdForViewer_success() {
+    void findUserByIdForViewer_success() throws IOException {
         var query = createNearbyBarsQuery();
         var barListItemModel = _fixtureMonkey.giveMeOne(BarListItemModel.class);
 

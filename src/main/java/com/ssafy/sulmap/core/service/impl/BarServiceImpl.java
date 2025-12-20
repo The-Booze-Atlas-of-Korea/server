@@ -7,10 +7,13 @@ import com.ssafy.sulmap.core.repository.BarRepository;
 import com.ssafy.sulmap.core.service.BarService;
 import com.ssafy.sulmap.share.result.Result;
 import com.ssafy.sulmap.share.result.error.impl.NotFoundError;
+import com.ssafy.sulmap.share.result.error.impl.SimpleError;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -22,8 +25,18 @@ public class BarServiceImpl implements BarService {
 
     @Override
     public Result<List<BarListItemModel>> findNearbyBars(NearbyBarsQuery query) {
-        var result = _barRepository.findNearby(query);
-        return Result.ok(result);
+        try {
+            var result = _barRepository.findNearby(query);
+            return Result.ok(result);
+        }
+        catch (Exception e) {
+            return Result.fail(SimpleError.builder()
+                    .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                    .message("Internal server error")
+                    .metadata(Map.of("exception", e.getClass().getSimpleName()))
+                    .cause(e)
+                    .build());
+        }
     }
 
     @Override
