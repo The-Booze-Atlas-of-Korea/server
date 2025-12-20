@@ -12,8 +12,9 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class BarCategoryModel {
-    private Long id;
     private String name;
+    private String groupName;
+    private Integer priority;
     private Date createdAt;
     private Date updatedAt;
     private Date deletedAt;

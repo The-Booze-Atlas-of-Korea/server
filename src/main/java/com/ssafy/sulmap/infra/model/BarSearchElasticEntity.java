@@ -1,5 +1,6 @@
 package com.ssafy.sulmap.infra.model;
 
+import com.ssafy.sulmap.core.model.BarListItemModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,4 +25,19 @@ public class BarSearchElasticEntity {
     private Date updatedAt;
     private Date deletedAt;
     private Double distanceMeters;
+
+    public BarListItemModel toBarListItemModel() {
+        return BarListItemModel.builder()
+                .id(this.getId())
+                .address(this.getAddress())
+                .name(this.getName())
+                .latitude(this.getLatitude())
+                .longitude(this.getLongitude())
+                .baseCategoryName(this.getBaseCategoryName())
+                .openInformation(this.getOpenInfo())
+                .createdAt(this.getCreatedAt())
+                .updatedAt(this.getUpdatedAt())
+                .deletedAt(this.getDeletedAt())
+                .build();
+    }
 }
