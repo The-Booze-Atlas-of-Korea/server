@@ -76,7 +76,7 @@ public class BarSearchElasticClient {
                         }))
                         // 정렬
                         .sort(sort -> {
-                            String sortKey = query.sort() == null ? "" : query.sort().trim().toLowerCase();
+                            String sortKey = query.sort() == null ? "distance" : query.sort().trim().toLowerCase();
 
                             if ("distance".equals(sortKey)) {
                                 // 거리 오름차순
