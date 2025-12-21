@@ -77,6 +77,11 @@ class ScheduleControllerTest {
         Long userId = 1L;
         UserDetail principal = createUserDetail(userId);
 
+        var request = new com.ssafy.sulmap.api.dto.request.CreateScheduleRequest(
+                10L,
+                "크리스마스 모임",
+                LocalDateTime.of(2024, 12, 25, 18, 0));
+
         DrinkingScheduleModel createdSchedule = DrinkingScheduleModel.builder()
                 .id(100L)
                 .ownerUserId(userId)
@@ -93,7 +98,7 @@ class ScheduleControllerTest {
         when(_scheduleService.createSchedule(any(CreateScheduleCommand.class))).thenReturn(result);
 
         // when
-        ResponseEntity<?> response = scheduleController.createSchedule(null, principal);
+        ResponseEntity<?> response = scheduleController.createSchedule(request, principal);
 
         // then
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -108,6 +113,11 @@ class ScheduleControllerTest {
         Long userId = 1L;
         UserDetail principal = createUserDetail(userId);
 
+        var request = new com.ssafy.sulmap.api.dto.request.CreateScheduleRequest(
+                null,
+                "일정 제목",
+                LocalDateTime.now());
+
         @SuppressWarnings("unchecked")
         Result<DrinkingScheduleModel> result = (Result<DrinkingScheduleModel>) mock(Result.class);
         NotFoundError error = mock(NotFoundError.class);
@@ -118,7 +128,7 @@ class ScheduleControllerTest {
         when(_scheduleService.createSchedule(any(CreateScheduleCommand.class))).thenReturn(result);
 
         // when
-        ResponseEntity<?> response = scheduleController.createSchedule(null, principal);
+        ResponseEntity<?> response = scheduleController.createSchedule(request, principal);
 
         // then
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -132,6 +142,11 @@ class ScheduleControllerTest {
         Long userId = 1L;
         Long scheduleId = 100L;
         UserDetail principal = createUserDetail(userId);
+
+        var request = new com.ssafy.sulmap.api.dto.request.UpdateScheduleRequest(
+                "수정된 일정",
+                null,
+                "COMPLETED");
 
         DrinkingScheduleModel updatedSchedule = DrinkingScheduleModel.builder()
                 .id(scheduleId)
@@ -147,7 +162,7 @@ class ScheduleControllerTest {
         when(_scheduleService.updateSchedule(any(UpdateScheduleCommand.class))).thenReturn(result);
 
         // when
-        ResponseEntity<?> response = scheduleController.updateSchedule(scheduleId, null, principal);
+        ResponseEntity<?> response = scheduleController.updateSchedule(scheduleId, request, principal);
 
         // then
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -163,6 +178,11 @@ class ScheduleControllerTest {
         Long scheduleId = 999L;
         UserDetail principal = createUserDetail(userId);
 
+        var request = new com.ssafy.sulmap.api.dto.request.UpdateScheduleRequest(
+                "일정 제목",
+                null,
+                null);
+
         @SuppressWarnings("unchecked")
         Result<DrinkingScheduleModel> result = (Result<DrinkingScheduleModel>) mock(Result.class);
         NotFoundError error = mock(NotFoundError.class);
@@ -173,7 +193,7 @@ class ScheduleControllerTest {
         when(_scheduleService.updateSchedule(any(UpdateScheduleCommand.class))).thenReturn(result);
 
         // when
-        ResponseEntity<?> response = scheduleController.updateSchedule(scheduleId, null, principal);
+        ResponseEntity<?> response = scheduleController.updateSchedule(scheduleId, request, principal);
 
         // then
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -188,6 +208,11 @@ class ScheduleControllerTest {
         Long scheduleId = 100L;
         UserDetail principal = createUserDetail(userId);
 
+        var request = new com.ssafy.sulmap.api.dto.request.UpdateScheduleRequest(
+                "일정 제목",
+                null,
+                null);
+
         @SuppressWarnings("unchecked")
         Result<DrinkingScheduleModel> result = (Result<DrinkingScheduleModel>) mock(Result.class);
         NotFoundError error = mock(NotFoundError.class);
@@ -198,7 +223,7 @@ class ScheduleControllerTest {
         when(_scheduleService.updateSchedule(any(UpdateScheduleCommand.class))).thenReturn(result);
 
         // when
-        ResponseEntity<?> response = scheduleController.updateSchedule(scheduleId, null, principal);
+        ResponseEntity<?> response = scheduleController.updateSchedule(scheduleId, request, principal);
 
         // then
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
