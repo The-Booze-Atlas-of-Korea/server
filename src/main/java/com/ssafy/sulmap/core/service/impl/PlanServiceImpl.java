@@ -6,6 +6,7 @@ import com.ssafy.sulmap.core.model.command.UpdatePlanCommand;
 import com.ssafy.sulmap.core.repository.PlanRepository;
 import com.ssafy.sulmap.core.service.PlanService;
 import com.ssafy.sulmap.share.result.Result;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -58,5 +59,42 @@ public class PlanServiceImpl implements PlanService {
         return _planRepository.findById(planId)
                 .map(Result::ok)
                 .orElse(Result.fail(404, "플랜을 찾을 수 없습니다"));
+    }
+
+    @Override
+    public Result<List<DrinkingPlanModel>> listPlans(Long ownerUserId, int page, int size, String sort) {
+        // 파라미터 방어
+        if (ownerUserId == null) return Result.fail(401, "인증이 필요합니다");
+        if (page < 0) return Result.fail(400, "page는 0 이상이어야 합니다");
+        if (size <= 0) return Result.fail(400, "size는 1 이상이어야 합니다");
+
+        // 과도한 요청 방지(선택)
+        if (size > 100) {
+            return Result.fail(400, "size는 100 이하여야 합니다.");
+        }
+
+
+        // sort는 아직 미확정이면 무시해도 됨(일단 파라미터만 받기)
+        // offset/limit 계산 (page=0부터)
+        int offset = page * size;
+        int limit = size;
+
+        //인젝션 방어
+        String normalizedSort = normalizeSortOrDefault(sort);
+
+        // Repository 메서드가 필요함 (아래 3) 참고)
+        List<DrinkingPlanModel> plans = _planRepository.findByOwnerUserId(ownerUserId, offset, limit, sort);
+
+        return Result.ok(plans);
+    }
+    private String normalizeSortOrDefault(String sort) {
+        if (sort == null || sort.isBlank())
+            return "createdAt,desc";
+
+        // 허용 리스트(필요 시 확장)
+        return switch (sort) {
+            case "createdAt,desc", "createdAt,asc" -> sort;
+            default -> "createdAt,desc";
+        };
     }
 }
