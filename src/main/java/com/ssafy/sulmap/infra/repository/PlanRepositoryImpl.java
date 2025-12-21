@@ -52,6 +52,17 @@ public class PlanRepositoryImpl implements PlanRepository {
         _planMapper.deletePlan(id);
     }
 
+    @Override
+    public List<DrinkingPlanModel> findByOwnerUserId(Long ownerUserId, int offset, int limit, String sort) {
+        var entities = _planMapper.selectByOwnerUserId(ownerUserId, offset, limit, sort);
+
+        return entities.stream().map(entity -> {
+            var planId = entity.getId();
+            var spotEntities = _planMapper.selectSpotsByPlanId(planId);
+            return entity.toModel(spotEntities);
+        }).toList();
+    }
+
     /**
      * 신규 플랜 삽입
      */
