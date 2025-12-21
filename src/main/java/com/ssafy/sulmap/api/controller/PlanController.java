@@ -12,6 +12,7 @@ import com.ssafy.sulmap.core.model.enums.PlanTheme;
 import com.ssafy.sulmap.core.service.PlanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +47,8 @@ public class PlanController {
 
         var result = _planService.createPlan(command);
         if (result.isFailure()) {
-            return new ResponseEntity<>(result.getSingleErrorOrThrow().getStatus());
+            var status = result.getSingleErrorOrThrow().getStatus();
+            return ResponseEntity.status(status).build();
         }
 
         return ResponseEntity.ok(PlanResponse.fromModel(result.getOrThrow()));
@@ -106,7 +108,7 @@ public class PlanController {
 
         // deletePlan은 아직 구현되지 않았으므로 임시로 비워둠
         // CORE 레이어에 deletePlan 메서드가 필요함 (Follow-up)
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
     }
 
     //개인 플랜 목록: 인증 필요
