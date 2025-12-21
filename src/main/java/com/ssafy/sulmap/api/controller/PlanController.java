@@ -78,9 +78,9 @@ public class PlanController {
 
         var result = _planService.updatePlan(command);
         if (result.isFailure()) {
-            return new ResponseEntity<>(result.getSingleErrorOrThrow().getStatus());
+            var status = result.getSingleErrorOrThrow().getStatus();
+            return ResponseEntity.status(status).build();
         }
-
         return ResponseEntity.ok(PlanResponse.fromModel(result.getOrThrow()));
     }
 
@@ -91,9 +91,9 @@ public class PlanController {
     public ResponseEntity<?> getPlan(@PathVariable("id") Long planId) {
         var result = _planService.getPlan(planId);
         if (result.isFailure()) {
-            return new ResponseEntity<>(result.getSingleErrorOrThrow().getStatus());
+            var status = result.getSingleErrorOrThrow().getStatus();
+            return ResponseEntity.status(status).build();
         }
-
         return ResponseEntity.ok(PlanResponse.fromModel(result.getOrThrow()));
     }
 
@@ -119,6 +119,10 @@ public class PlanController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String sort
     ) {
+        if (userDetail == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         var userId = userDetail.userModel().getId();
 
         var result = _planService.listPlans(userId, page, size, sort);
@@ -126,7 +130,6 @@ public class PlanController {
             var status = result.getSingleErrorOrThrow().getStatus();
             return ResponseEntity.status(status).build();
         }
-
         var plans = result.getOrThrow();
         var response = plans.stream().map(PlanResponse::fromModel).toList();
         return ResponseEntity.ok(response);
