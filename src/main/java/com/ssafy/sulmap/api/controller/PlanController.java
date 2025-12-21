@@ -109,6 +109,27 @@ public class PlanController {
         return ResponseEntity.ok().build();
     }
 
+    //개인 플랜 목록: 인증 필요
+    @GetMapping
+    public ResponseEntity<?> listPlans(
+            @AuthenticationPrincipal UserDetail userDetail,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sort
+    ) {
+        var userId = userDetail.userModel().getId();
+
+        var result = _planService.listPlans(userId, page, size, sort);
+        if (result.isFailure()) {
+            var status = result.getSingleErrorOrThrow().getStatus();
+            return ResponseEntity.status(status).build();
+        }
+
+        var plans = result.getOrThrow();
+        var response = plans.stream().map(PlanResponse::fromModel).toList();
+        return ResponseEntity.ok(response);
+    }
+
     /**
      * Request DTO -> Core Model 변환 헬퍼
      */
@@ -123,4 +144,5 @@ public class PlanController {
                 .memo(request.memo())
                 .build();
     }
+
 }
