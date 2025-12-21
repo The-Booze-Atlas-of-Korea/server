@@ -57,7 +57,7 @@ public class PlanController {
     /**
      * 플랜 수정
      */
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<?> updatePlan(
             @PathVariable("id") Long planId,
             @Valid @RequestBody UpdatePlanRequest request,
