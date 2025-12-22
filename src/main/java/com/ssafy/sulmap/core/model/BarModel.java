@@ -15,7 +15,7 @@ import java.util.List;
 public class BarModel {
     private Long id;
     private String name;
-    private String Address;
+    private String address;
     private Double latitude;
     private Double longitude;
     private String baseCategoryName;

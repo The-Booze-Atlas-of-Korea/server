@@ -4,6 +4,7 @@ import com.ssafy.sulmap.core.model.BarListItemModel;
 import com.ssafy.sulmap.core.model.BarModel;
 import com.ssafy.sulmap.core.model.query.NearbyBarsQuery;
 
+import java.io.IOException;
 import java.util.*;
 
 public interface BarRepository {
@@ -11,5 +12,5 @@ public interface BarRepository {
     /**
      * FR2(+FR1): 현재 위치 기준 주변 술집 검색 (반경/필터/정렬/키워드 포함 가능)
      */
-    List<BarListItemModel> findNearby(NearbyBarsQuery query);
+    List<BarListItemModel> findNearby(NearbyBarsQuery query) throws IOException;
 }
