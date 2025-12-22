@@ -14,4 +14,6 @@ public interface PlanService {
     Result<DrinkingPlanModel> getPlan(Long planId);
 
     Result<List<DrinkingPlanModel>> listPlans(Long ownerUserId, int page, int size, String sort);
+
+    Result<Void> deletePlan(Long planId, Long userId);
 }
