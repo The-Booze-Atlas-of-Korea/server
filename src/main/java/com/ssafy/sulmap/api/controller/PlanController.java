@@ -106,19 +106,22 @@ public class PlanController {
             @AuthenticationPrincipal UserDetail userDetail) {
         var userId = userDetail.userModel().getId();
 
-        // deletePlan은 아직 구현되지 않았으므로 임시로 비워둠
-        // CORE 레이어에 deletePlan 메서드가 필요함 (Follow-up)
-        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
+        var result = _planService.deletePlan(planId, userId);
+        if (result.isFailure()) {
+            var status = result.getSingleErrorOrThrow().getStatus();
+            return ResponseEntity.status(status).build();
+        }
+
+        return ResponseEntity.ok().build();
     }
 
-    //개인 플랜 목록: 인증 필요
+    // 개인 플랜 목록: 인증 필요
     @GetMapping
     public ResponseEntity<?> listPlans(
             @AuthenticationPrincipal UserDetail userDetail,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String sort
-    ) {
+            @RequestParam(required = false) String sort) {
         if (userDetail == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
