@@ -12,6 +12,7 @@ import com.ssafy.sulmap.core.model.enums.PlanTheme;
 import com.ssafy.sulmap.core.service.PlanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +47,8 @@ public class PlanController {
 
         var result = _planService.createPlan(command);
         if (result.isFailure()) {
-            return new ResponseEntity<>(result.getSingleErrorOrThrow().getStatus());
+            var status = result.getSingleErrorOrThrow().getStatus();
+            return ResponseEntity.status(status).build();
         }
 
         return ResponseEntity.ok(PlanResponse.fromModel(result.getOrThrow()));
@@ -55,7 +57,7 @@ public class PlanController {
     /**
      * 플랜 수정
      */
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<?> updatePlan(
             @PathVariable("id") Long planId,
             @Valid @RequestBody UpdatePlanRequest request,
@@ -76,9 +78,9 @@ public class PlanController {
 
         var result = _planService.updatePlan(command);
         if (result.isFailure()) {
-            return new ResponseEntity<>(result.getSingleErrorOrThrow().getStatus());
+            var status = result.getSingleErrorOrThrow().getStatus();
+            return ResponseEntity.status(status).build();
         }
-
         return ResponseEntity.ok(PlanResponse.fromModel(result.getOrThrow()));
     }
 
@@ -89,9 +91,9 @@ public class PlanController {
     public ResponseEntity<?> getPlan(@PathVariable("id") Long planId) {
         var result = _planService.getPlan(planId);
         if (result.isFailure()) {
-            return new ResponseEntity<>(result.getSingleErrorOrThrow().getStatus());
+            var status = result.getSingleErrorOrThrow().getStatus();
+            return ResponseEntity.status(status).build();
         }
-
         return ResponseEntity.ok(PlanResponse.fromModel(result.getOrThrow()));
     }
 
@@ -104,9 +106,36 @@ public class PlanController {
             @AuthenticationPrincipal UserDetail userDetail) {
         var userId = userDetail.userModel().getId();
 
-        // deletePlan은 아직 구현되지 않았으므로 임시로 비워둠
-        // CORE 레이어에 deletePlan 메서드가 필요함 (Follow-up)
+        var result = _planService.deletePlan(planId, userId);
+        if (result.isFailure()) {
+            var status = result.getSingleErrorOrThrow().getStatus();
+            return ResponseEntity.status(status).build();
+        }
+
         return ResponseEntity.ok().build();
+    }
+
+    // 개인 플랜 목록: 인증 필요
+    @GetMapping
+    public ResponseEntity<?> listPlans(
+            @AuthenticationPrincipal UserDetail userDetail,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sort) {
+        if (userDetail == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        var userId = userDetail.userModel().getId();
+
+        var result = _planService.listPlans(userId, page, size, sort);
+        if (result.isFailure()) {
+            var status = result.getSingleErrorOrThrow().getStatus();
+            return ResponseEntity.status(status).build();
+        }
+        var plans = result.getOrThrow();
+        var response = plans.stream().map(PlanResponse::fromModel).toList();
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -123,4 +152,5 @@ public class PlanController {
                 .memo(request.memo())
                 .build();
     }
+
 }

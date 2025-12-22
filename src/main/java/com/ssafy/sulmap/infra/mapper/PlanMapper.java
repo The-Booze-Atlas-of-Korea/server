@@ -43,4 +43,15 @@ public interface PlanMapper {
      * 플랜 삭제
      */
     int deletePlan(@Param("id") Long id);
+
+    /**
+     * 플랜
+     * 조회
+     */
+    List<DrinkingPlanEntity> selectByOwnerUserId(
+            @Param("ownerUserId") long ownerUserId,
+            @Param("offset") int offset,
+            @Param("limit") int limit,
+            @Param("sort") String sort
+    );
 }

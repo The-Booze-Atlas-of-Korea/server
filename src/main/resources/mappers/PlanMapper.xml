@@ -85,4 +85,17 @@
         WHERE id = #{id}
     </delete>
 
+    <select id="selectByOwnerUserId" resultMap="PlanResultMap">
+        SELECT id, owner_user_id, title, description, theme, total_budget, created_at, updated_at
+        FROM drinking_plan
+        WHERE owner_user_id = #{ownerUserId}
+        ORDER BY
+        <choose>
+            <when test="sort == 'createdAt,asc'">created_at ASC</when>
+            <when test="sort == 'createdAt,desc'">created_at DESC</when>
+            <otherwise>created_at DESC</otherwise>
+        </choose>
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
 </mapper>

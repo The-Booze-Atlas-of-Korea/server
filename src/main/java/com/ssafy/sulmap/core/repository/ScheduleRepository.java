@@ -12,4 +12,6 @@ public interface ScheduleRepository {
     Optional<DrinkingScheduleModel> findById(Long id);
 
     List<DrinkingScheduleModel> findByPeriod(Long userId, LocalDateTime start, LocalDateTime end);
+
+    void delete(Long id);
 }

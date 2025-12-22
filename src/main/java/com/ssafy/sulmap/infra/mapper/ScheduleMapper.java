@@ -31,4 +31,9 @@ public interface ScheduleMapper {
      * 일정 수정
      */
     int update(DrinkingScheduleEntity entity);
+
+    /**
+     * 일정 삭제
+     */
+    int deleteById(@Param("id") Long id);
 }
