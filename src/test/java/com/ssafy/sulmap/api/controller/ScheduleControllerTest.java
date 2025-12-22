@@ -7,6 +7,7 @@ import com.ssafy.sulmap.core.model.UserModel;
 import com.ssafy.sulmap.core.model.command.CreateScheduleCommand;
 import com.ssafy.sulmap.core.model.command.UpdateScheduleCommand;
 import com.ssafy.sulmap.core.model.enums.ScheduleStatus;
+import com.ssafy.sulmap.core.model.query.GetSchedulesInPeriodQuery;
 import com.ssafy.sulmap.core.service.ScheduleService;
 import com.ssafy.sulmap.share.result.Result;
 import com.ssafy.sulmap.share.result.error.impl.NotFoundError;
@@ -298,6 +299,7 @@ class ScheduleControllerTest {
         Result<List<DrinkingScheduleModel>> result = (Result<List<DrinkingScheduleModel>>) mock(Result.class);
         when(result.isFailure()).thenReturn(false);
         when(result.getOrThrow()).thenReturn(schedules);
+        when(_scheduleService.getSchedulesInPeriod(any(GetSchedulesInPeriodQuery.class))).thenReturn(result);
 
         // when
         ResponseEntity<?> response = scheduleController.getSchedulesByPeriod(from, to, principal);
