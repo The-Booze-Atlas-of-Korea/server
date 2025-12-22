@@ -29,118 +29,112 @@ import java.util.List;
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(               // ⬅⬅⬅ 이게 포인트
-        prePostEnabled = true,          // @PreAuthorize, @PostAuthorize
-        securedEnabled = true,          // @Secured
-        jsr250Enabled = true            // @RolesAllowed
+@EnableMethodSecurity( // ⬅⬅⬅ 이게 포인트
+                prePostEnabled = true, // @PreAuthorize, @PostAuthorize
+                securedEnabled = true, // @Secured
+                jsr250Enabled = true // @RolesAllowed
 )
 public class SecurityConfig {
 
-    private final UserService userService; // 이미 구현된 서비스
+        private final UserService userService; // 이미 구현된 서비스
 
-
-    // swagger / springdoc 경로 화이트리스트
-    private static final String[] _SWAGGER_WHITELIST = {
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/swagger-resources/**",
-            "/webjars/**"
-    };
-
-    /**
-     * 도메인 UserService 를 사용해서 UserDetails 로 감싸주는 어댑터
-     */
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return username -> {
-            // username = loginId
-            var findUserResult = userService.findUserByLoginId(username);
-            return new UserDetail(findUserResult.getOrThrow(
-                    new UsernameNotFoundException("User not found: " + username)));
+        // swagger / springdoc 경로 화이트리스트
+        private static final String[] _SWAGGER_WHITELIST = {
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/swagger-resources/**",
+                        "/webjars/**"
         };
-    }
 
-    @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider(
-            UserDetailsService userDetailsService,
-            PasswordEncoder passwordEncoder
-    ) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder);
-        return provider;
-    }
+        /**
+         * 도메인 UserService 를 사용해서 UserDetails 로 감싸주는 어댑터
+         */
+        @Bean
+        public UserDetailsService userDetailsService() {
+                return username -> {
+                        // username = loginId
+                        var findUserResult = userService.findUserByLoginId(username);
+                        return new UserDetail(findUserResult.getOrThrow(
+                                        new UsernameNotFoundException("User not found: " + username)));
+                };
+        }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http,
-            DaoAuthenticationProvider authenticationProvider
-    ) throws Exception {
+        @Bean
+        public DaoAuthenticationProvider daoAuthenticationProvider(
+                        UserDetailsService userDetailsService,
+                        PasswordEncoder passwordEncoder) {
+                DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+                provider.setPasswordEncoder(passwordEncoder);
+                return provider;
+        }
 
-        http
-                // REST API + 세션/쿠키. CSRF는 프론트/운영 환경에 맞게 나중에 켜는 걸 추천
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        @Bean
+        public SecurityFilterChain securityFilterChain(
+                        HttpSecurity http,
+                        DaoAuthenticationProvider authenticationProvider) throws Exception {
 
-                // 세션 기반 인증
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                )
+                http
+                                // REST API + 세션/쿠키. CSRF는 프론트/운영 환경에 맞게 나중에 켜는 걸 추천
+                                .csrf(AbstractHttpConfigurer::disable)
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-                // 폼 로그인, HTTP Basic 비활성화 (우리가 직접 /api/auth/login 사용)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable)
+                                // 세션 기반 인증
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 
-                // 인가 규칙
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/login", "/auth/signup").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/health", "/docs/**").permitAll()
-                        .requestMatchers(_SWAGGER_WHITELIST).permitAll()
-                        .requestMatchers("/error").permitAll()
-                        .anyRequest().authenticated()
-                )
+                                // 폼 로그인, HTTP Basic 비활성화 (우리가 직접 /api/auth/login 사용)
+                                .formLogin(AbstractHttpConfigurer::disable)
+                                .httpBasic(AbstractHttpConfigurer::disable)
 
-                // 로그아웃 엔드포인트
-                .logout(logout -> logout
-                        .logoutUrl("/auth/logout")
-                        .deleteCookies("JSESSIONID")
-                )
+                                // 인가 규칙
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                                .requestMatchers("/api/auth/login", "/api/auth/signup").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/health", "/docs/**").permitAll()
+                                                .requestMatchers(_SWAGGER_WHITELIST).permitAll()
+                                                .requestMatchers("/error").permitAll()
+                                                .anyRequest().authenticated())
 
-                // AuthenticationProvider 등록
-                .authenticationProvider(authenticationProvider);
+                                // 로그아웃 엔드포인트
+                                .logout(logout -> logout
+                                                .logoutUrl("/api/auth/logout")
+                                                .deleteCookies("JSESSIONID"))
 
-        return http.build();
-    }
+                                // AuthenticationProvider 등록
+                                .authenticationProvider(authenticationProvider);
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
+                return http.build();
+        }
 
-        // 프론트 주소를 정확히 적어야 함 (지금 에러에 나온 5173)
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration config = new CorsConfiguration();
 
-        // 사용하는 메소드들
-        config.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
+                // 프론트 주소를 정확히 적어야 함 (지금 에러에 나온 5173)
+                config.setAllowedOrigins(List.of("http://localhost:5173"));
 
-        // 헤더들
-        config.setAllowedHeaders(List.of("*"));
+                // 사용하는 메소드들
+                config.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
 
-        // 세션/쿠키 쓸 거면 true
-        config.setAllowCredentials(true);
+                // 헤더들
+                config.setAllowedHeaders(List.of("*"));
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // 필요한 경로만 좁히고 싶으면 "/api/**" 로
-        source.registerCorsConfiguration("/**", config);
+                // 세션/쿠키 쓸 거면 true
+                config.setAllowCredentials(true);
 
-        return source;
-    }
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                // 필요한 경로만 좁히고 싶으면 "/api/**" 로
+                source.registerCorsConfiguration("/**", config);
 
-    /**
-     * 컨트롤러에서 AuthenticationManager 주입받아서 사용
-     */
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-    }
+                return source;
+        }
+
+        /**
+         * 컨트롤러에서 AuthenticationManager 주입받아서 사용
+         */
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+                return configuration.getAuthenticationManager();
+        }
 }
