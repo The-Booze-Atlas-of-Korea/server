@@ -21,7 +21,7 @@ public class BarController {
     /**
      * 문서: POST /api/bars/nearby :contentReference[oaicite:12]{index=12}
      */
-    @PostMapping("/api/bars/nearby")
+    @PostMapping("/bars/nearby")
     public List<BarListItemModel> findNearby(@Valid @RequestBody FindNearByBarRequest req) {
         NearbyBarsQuery query = new NearbyBarsQuery(req.latitude(), req.longitude(), req.radiusMeters(), req.count(), req.keyword(), req.category(), req.sort());
 
