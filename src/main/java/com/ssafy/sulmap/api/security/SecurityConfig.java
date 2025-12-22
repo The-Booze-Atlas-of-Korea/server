@@ -90,7 +90,7 @@ public class SecurityConfig {
                                 // 인가 규칙
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                                .requestMatchers("/api/auth/login", "/api/auth/signup").permitAll()
+                                                .requestMatchers("/auth/login", "/auth/signup").permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/health", "/docs/**").permitAll()
                                                 .requestMatchers(_SWAGGER_WHITELIST).permitAll()
                                                 .requestMatchers("/error").permitAll()
@@ -98,7 +98,7 @@ public class SecurityConfig {
 
                                 // 로그아웃 엔드포인트
                                 .logout(logout -> logout
-                                                .logoutUrl("/api/auth/logout")
+                                                .logoutUrl("/auth/logout")
                                                 .deleteCookies("JSESSIONID"))
 
                                 // AuthenticationProvider 등록
