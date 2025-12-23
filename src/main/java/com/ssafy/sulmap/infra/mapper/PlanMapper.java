@@ -25,6 +25,11 @@ public interface PlanMapper {
     DrinkingPlanEntity selectById(@Param("id") Long id);
 
     /**
+     * 사용자별 플랜 목록 조회
+     */
+    List<DrinkingPlanEntity> selectByOwnerUserId(@Param("ownerUserId") Long ownerUserId);
+
+    /**
      * 특정 플랜의 스팟 목록 조회
      */
     List<DrinkingPlanSpotEntity> selectSpotsByPlanId(@Param("planId") Long planId);

@@ -51,6 +51,14 @@
         WHERE id = #{id}
     </select>
 
+    <!-- 사용자별 플랜 목록 조회 -->
+    <select id="selectByOwnerUserId" parameterType="long" resultMap="PlanResultMap">
+        SELECT id, owner_user_id, title, description, theme, total_budget, created_at, updated_at
+        FROM drinking_plan
+        WHERE owner_user_id = #{ownerUserId}
+        ORDER BY created_at DESC
+    </select>
+
     <!-- 특정 플랜의 스팟 목록 조회 -->
     <select id="selectSpotsByPlanId" parameterType="long" resultMap="PlanSpotResultMap">
         SELECT id, plan_id, place_id, place_name_snapshot, place_address_snapshot, 
