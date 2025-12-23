@@ -1,6 +1,5 @@
 package com.ssafy.sulmap.infra.plan;
 
-import com.ssafy.sulmap.core.model.enums.PlanTheme;
 import com.ssafy.sulmap.core.model.DrinkingPlanModel;
 import com.ssafy.sulmap.core.model.DrinkingPlanSpotModel;
 import com.ssafy.sulmap.infra.mapper.PlanMapper;
@@ -60,7 +59,7 @@ public class PlanRepositoryImplTest {
                 .ownerUserId(1L)
                 .title("연말 회식 플랜")
                 .description("2024 연말 회식")
-                .theme(PlanTheme.COMPANY)
+                .theme("COMPANY")
                 .totalBudget(100000L)
                 .spots(Arrays.asList(spot1, spot2))
                 .build();
@@ -111,7 +110,7 @@ public class PlanRepositoryImplTest {
                 .ownerUserId(1L)
                 .title("수정된 플랜")
                 .description("변경됨")
-                .theme(PlanTheme.FRIEND)
+                .theme("FRIEND")
                 .totalBudget(50000L)
                 .spots(Arrays.asList(newSpot))
                 .build();
