@@ -1,12 +1,12 @@
 package com.ssafy.sulmap.core.model;
 
-import com.ssafy.sulmap.core.model.enums.PlanTheme;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -18,15 +18,15 @@ public class DrinkingPlanModel {
     private Long ownerUserId;
     private String title;
     private String description;
-    private PlanTheme theme;
+    private String theme;
     private Long totalBudget;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     // 선택 사항: 장소 목록은 한꺼번에 또는 개별적으로 로드할 수 있음.
-    private List<DrinkingPlanSpotModel> spots;
+    private List<DrinkingPlanSpotModel> spots = new ArrayList<>();
 
-    public void update(String title, String description, PlanTheme theme, Long totalBudget) {
+    public void update(String title, String description, String theme, Long totalBudget) {
         this.title = title;
         this.description = description;
         this.theme = theme;
