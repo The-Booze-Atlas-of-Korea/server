@@ -16,4 +16,6 @@ public interface ScheduleService {
     Result<DrinkingScheduleModel> getSchedule(Long scheduleId);
 
     Result<List<DrinkingScheduleModel>> getSchedulesInPeriod(GetSchedulesInPeriodQuery query);
+
+    Result<List<DrinkingScheduleModel>> getScheduleHistory(Long userId, int page, int size);
 }
