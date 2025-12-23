@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -58,5 +59,11 @@ public class PlanServiceImpl implements PlanService {
         return _planRepository.findById(planId)
                 .map(Result::ok)
                 .orElse(Result.fail(404, "플랜을 찾을 수 없습니다"));
+    }
+
+    @Override
+    public Result<List<DrinkingPlanModel>> listPlans(Long userId) {
+        List<DrinkingPlanModel> plans = _planRepository.findByOwnerUserId(userId);
+        return Result.ok(plans);
     }
 }
