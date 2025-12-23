@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RecommendedBarModel extends MinorRecommendBarModel {
+public class RecommendedBarModel extends MinorRecommendedBarModel {
     private int recommendRank;
     private String recommendReason;
 }
