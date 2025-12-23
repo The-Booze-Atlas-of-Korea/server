@@ -9,7 +9,6 @@ import com.ssafy.sulmap.api.security.model.UserDetail;
 import com.ssafy.sulmap.core.model.DrinkingPlanSpotModel;
 import com.ssafy.sulmap.core.model.command.CreatePlanCommand;
 import com.ssafy.sulmap.core.model.command.UpdatePlanCommand;
-import com.ssafy.sulmap.core.model.enums.PlanTheme;
 import com.ssafy.sulmap.core.service.PlanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -38,11 +38,13 @@ public class PlanController {
                 .ownerUserId(userId)
                 .title(request.title())
                 .description(request.description())
-                .theme(PlanTheme.fromString(request.theme()))
+                .theme(request.theme())
                 .totalBudget(request.totalBudget())
-                .spots(request.spots() != null ? request.spots().stream()
-                        .map(this::toSpotModel)
-                        .collect(Collectors.toList()) : null)
+                .spots(request.spots() == null
+                        ? List.of()
+                        : request.spots().stream()
+                                .map(this::toSpotModel)
+                                .toList())
                 .build();
 
         var result = _planService.createPlan(command);
@@ -87,11 +89,13 @@ public class PlanController {
                 .userId(userId)
                 .title(request.title())
                 .description(request.description())
-                .theme(request.theme() != null ? PlanTheme.fromString(request.theme()) : null)
+                .theme(request.theme())
                 .totalBudget(request.totalBudget())
-                .spots(request.spots() != null ? request.spots().stream()
-                        .map(this::toSpotModel)
-                        .collect(Collectors.toList()) : null)
+                .spots(request.spots() == null
+                        ? null
+                        : request.spots().stream()
+                                .map(this::toSpotModel)
+                                .toList())
                 .build();
 
         var result = _planService.updatePlan(command);
