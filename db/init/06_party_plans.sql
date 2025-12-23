@@ -6,7 +6,7 @@ CREATE TABLE drinking_plan
     owner_user_id BIGINT UNSIGNED                                    NOT NULL,
     title         VARCHAR(100)                                       NOT NULL,
     description   TEXT                                               NULL,
-    theme         ENUM ('CASUAL','PARTY','DATE','BUSINESS','SPECIAL') NULL,
+    theme         VARCHAR(50)                                        NOT NULL,
     total_budget  BIGINT                                             NULL,
     created_at    DATETIME                                           NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    DATETIME                                           NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
