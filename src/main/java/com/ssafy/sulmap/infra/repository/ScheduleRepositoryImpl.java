@@ -50,6 +50,15 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public List<DrinkingScheduleModel> findByOwnerUserIdPaged(Long userId, int offset, int limit) {
+        List<DrinkingScheduleEntity> entities = _scheduleMapper.selectByOwnerUserIdPaged(userId, offset, limit);
+        return entities.stream()
+                .map(DrinkingScheduleEntity::toModel)
+                .toList();
+    }
+
     /**
      * 신규 일정 삽입
      */
