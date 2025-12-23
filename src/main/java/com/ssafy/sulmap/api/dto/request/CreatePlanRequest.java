@@ -2,18 +2,18 @@ package com.ssafy.sulmap.api.dto.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
 public record CreatePlanRequest(
-        @NotBlank String title,
+                @NotBlank String title,
 
-        String description,
+                String description,
 
-        @NotBlank String theme, // FRIEND, COMPANY, DATE, ETC
+                @NotBlank @Size(max = 50) String theme, // Free-text, required, max 50 chars
 
-        Long totalBudget,
+                Long totalBudget,
 
-        @NotNull @Valid List<PlanSpotRequest> spots) {
+                @Valid List<PlanSpotRequest> spots) { // Nullable
 }
