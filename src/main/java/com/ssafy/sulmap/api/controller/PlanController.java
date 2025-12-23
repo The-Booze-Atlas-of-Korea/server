@@ -128,8 +128,11 @@ public class PlanController {
             @AuthenticationPrincipal UserDetail userDetail) {
         var userId = userDetail.userModel().getId();
 
-        // deletePlan은 아직 구현되지 않았으므로 임시로 비워둠
-        // CORE 레이어에 deletePlan 메서드가 필요함 (Follow-up)
+        var result = _planService.deletePlan(planId, userId);
+        if (result.isFailure()) {
+            return new ResponseEntity<>(result.getSingleErrorOrThrow().getStatus());
+        }
+
         return ResponseEntity.ok().build();
     }
 
