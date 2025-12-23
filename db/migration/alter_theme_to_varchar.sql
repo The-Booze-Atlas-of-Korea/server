@@ -5,6 +5,7 @@
 -- SELECT COUNT(*) FROM drinking_plan WHERE theme IS NULL OR TRIM(theme) = '';
 
 -- Step 2: Fill NULL/empty themes with UNKNOWN
+use sulmap;
 UPDATE drinking_plan 
 SET theme = 'UNKNOWN' 
 WHERE theme IS NULL OR TRIM(theme) = '';
