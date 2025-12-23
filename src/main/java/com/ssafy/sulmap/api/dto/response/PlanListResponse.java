@@ -1,7 +1,6 @@
 package com.ssafy.sulmap.api.dto.response;
 
 import com.ssafy.sulmap.core.model.DrinkingPlanModel;
-import com.ssafy.sulmap.core.model.enums.PlanTheme;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +22,7 @@ public class PlanListResponse {
     private Long ownerUserId;
     private String title;
     private String description;
-    private PlanTheme theme;
+    private String theme;
     private Long totalBudget;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
