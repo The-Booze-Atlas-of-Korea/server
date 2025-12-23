@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/schedules")
+@RequestMapping("/schedules")
 @RequiredArgsConstructor
 public class ScheduleController {
     private final ScheduleService _scheduleService;

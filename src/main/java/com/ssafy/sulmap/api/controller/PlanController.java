@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/plans")
+@RequestMapping("/plans")
 @RequiredArgsConstructor
 public class PlanController {
     private final PlanService _planService;
