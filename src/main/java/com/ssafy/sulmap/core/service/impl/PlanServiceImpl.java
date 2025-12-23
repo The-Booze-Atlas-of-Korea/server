@@ -8,6 +8,7 @@ import com.ssafy.sulmap.core.service.PlanService;
 import com.ssafy.sulmap.share.result.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -74,5 +75,22 @@ public class PlanServiceImpl implements PlanService {
     public Result<List<DrinkingPlanModel>> listPlans(Long userId) {
         List<DrinkingPlanModel> plans = _planRepository.findByOwnerUserId(userId);
         return Result.ok(plans);
+    }
+
+    @Override
+    @Transactional
+    public Result<Void> deletePlan(Long planId, Long userId) {
+        return _planRepository.findById(planId)
+                .map(plan -> {
+                    // 소유권 확인
+                    if (!plan.getOwnerUserId().equals(userId)) {
+                        return Result.<Void>fail(403, "플랜 삭제 권한이 없습니다");
+                    }
+
+                    // 플랜 삭제 (spots도 자동 삭제됨)
+                    _planRepository.delete(planId);
+                    return Result.<Void>ok(null);
+                })
+                .orElse(Result.fail(404, "플랜을 찾을 수 없습니다"));
     }
 }
