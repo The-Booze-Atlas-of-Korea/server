@@ -50,4 +50,13 @@
         WHERE id = #{id}
     </update>
 
+    <!-- 사용자별 일정 페이징 조회 (히스토리용) -->
+    <select id="selectByOwnerUserIdPaged" resultMap="ScheduleResultMap">
+        SELECT id, owner_user_id, plan_id, schedule_title, meet_at, status, created_at, updated_at
+        FROM drinking_schedule
+        WHERE owner_user_id = #{ownerUserId}
+        ORDER BY meet_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
 </mapper>
