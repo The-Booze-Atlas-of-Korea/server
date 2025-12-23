@@ -1,17 +1,18 @@
 package com.ssafy.sulmap.api.dto.request;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
 public record UpdatePlanRequest(
-        String title,
+                String title,
 
-        String description,
+                String description,
 
-        String theme, // FRIEND, COMPANY, DATE, ETC
+                @Size(max = 50) String theme, // null = no change
 
-        Long totalBudget,
+                Long totalBudget,
 
-        @Valid List<PlanSpotRequest> spots) {
+                @Valid List<PlanSpotRequest> spots) { // null = no change, [] = delete all
 }
