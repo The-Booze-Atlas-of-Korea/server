@@ -53,7 +53,7 @@ public interface PlanMapper {
      * 플랜
      * 조회
      */
-    List<DrinkingPlanEntity> selectByOwnerUserId(
+    List<DrinkingPlanEntity> selectByOwnerUserIdWithPaging(
             @Param("ownerUserId") long ownerUserId,
             @Param("offset") int offset,
             @Param("limit") int limit,
