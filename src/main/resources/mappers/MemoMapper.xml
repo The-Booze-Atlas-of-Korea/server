@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.sulmap.infra.mapper.MemoMapper">
+
+    <!-- ResultMap: Memo -->
+    <resultMap id="MemoResultMap" type="com.ssafy.sulmap.infra.model.MemoEntity">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="barId" column="bar_id"/>
+        <result property="content" column="content"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="deletedAt" column="deleted_at"/>
+    </resultMap>
+
+    <!-- Upsert (INSERT ... ON DUPLICATE KEY UPDATE) -->
+    <insert id="upsert"
+            parameterType="com.ssafy.sulmap.infra.model.MemoEntity"
+            useGeneratedKeys="true"
+            keyProperty="id"
+            keyColumn="id">
+        INSERT INTO memos (user_id, bar_id, content, created_at, updated_at, deleted_at)
+        VALUES (#{userId}, #{barId}, #{content}, NOW(), NOW(), null)
+        ON DUPLICATE KEY UPDATE
+            content = #{content},
+            updated_at = NOW(),
+            deleted_at = null
+    </insert>
+
+    <!-- SELECT by User ID and Bar ID -->
+    <select id="selectByUserIdAndBarId" resultMap="MemoResultMap">
+        SELECT id, user_id, bar_id, content, created_at, updated_at, deleted_at
+        FROM memos
+        WHERE user_id = #{userId}
+        AND bar_id = #{barId}
+        AND deleted_at IS NULL
+    </select>
+
+</mapper>
