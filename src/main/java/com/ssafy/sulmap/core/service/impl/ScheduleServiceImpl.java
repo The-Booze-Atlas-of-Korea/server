@@ -87,4 +87,18 @@ public class ScheduleServiceImpl implements ScheduleService {
         List<DrinkingScheduleModel> schedules = _scheduleRepository.findByOwnerUserIdPaged(userId, offset, size);
         return Result.ok(schedules);
     }
+  
+    public Result<Void> deleteSchedule(Long scheduleId, Long userId) {
+        return _scheduleRepository.findById(scheduleId)
+                .map(schedule -> {
+                    // 소유권 확인
+                    if (!schedule.getOwnerUserId().equals(userId)) {
+                        return Result.<Void>fail(403, "일정 삭제 권한이 없습니다");
+                    }
+
+                    _scheduleRepository.delete(scheduleId);
+                    return Result.<Void>ok(null);
+                })
+                .orElse(Result.fail(404, "일정을 찾을 수 없습니다"));
+    }
 }

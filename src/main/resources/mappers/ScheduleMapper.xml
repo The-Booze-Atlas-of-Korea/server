@@ -58,5 +58,11 @@
         ORDER BY meet_at DESC
         LIMIT #{limit} OFFSET #{offset}
     </select>
+  
+    <!-- 일정 삭제 -->
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM drinking_schedule
+        WHERE id = #{id}
+    </delete>
 
 </mapper>

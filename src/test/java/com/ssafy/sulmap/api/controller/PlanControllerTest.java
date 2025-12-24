@@ -76,6 +76,13 @@ class PlanControllerTest {
         Long userId = 1L;
         UserDetail principal = createUserDetail(userId);
 
+        var request = new com.ssafy.sulmap.api.dto.request.CreatePlanRequest(
+                "연말 회식 플랜",
+                "2024 연말 회식",
+                "COMPANY",
+                100000L,
+                Arrays.asList());
+
         DrinkingPlanModel createdPlan = DrinkingPlanModel.builder()
                 .id(10L)
                 .ownerUserId(userId)
@@ -95,7 +102,7 @@ class PlanControllerTest {
         when(_planService.createPlan(any(CreatePlanCommand.class))).thenReturn(result);
 
         // when
-        ResponseEntity<?> response = planController.createPlan(null, principal); // request는 나중에 구현
+        ResponseEntity<?> response = planController.createPlan(request, principal);
 
         // then
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -110,6 +117,13 @@ class PlanControllerTest {
         Long userId = 1L;
         UserDetail principal = createUserDetail(userId);
 
+        var request = new com.ssafy.sulmap.api.dto.request.CreatePlanRequest(
+                "플랜 제목",
+                null,
+                "FRIEND",
+                null,
+                Arrays.asList());
+
         @SuppressWarnings("unchecked")
         Result<DrinkingPlanModel> result = (Result<DrinkingPlanModel>) mock(Result.class);
         NotFoundError error = mock(NotFoundError.class);
@@ -120,7 +134,7 @@ class PlanControllerTest {
         when(_planService.createPlan(any(CreatePlanCommand.class))).thenReturn(result);
 
         // when
-        ResponseEntity<?> response = planController.createPlan(null, principal);
+        ResponseEntity<?> response = planController.createPlan(request, principal);
 
         // then
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -128,12 +142,19 @@ class PlanControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /api/plans/{id} - 플랜 수정 성공")
+    @DisplayName("PATCH /api/plans/{id} - 플랜 수정 성공")
     void updatePlan_Success() throws Exception {
         // given
         Long userId = 1L;
         Long planId = 10L;
         UserDetail principal = createUserDetail(userId);
+
+        var request = new com.ssafy.sulmap.api.dto.request.UpdatePlanRequest(
+                "수정된 플랜",
+                null,
+                "FRIEND",
+                null,
+                null);
 
         DrinkingPlanModel updatedPlan = DrinkingPlanModel.builder()
                 .id(planId)
@@ -149,7 +170,7 @@ class PlanControllerTest {
         when(_planService.updatePlan(any(UpdatePlanCommand.class))).thenReturn(result);
 
         // when
-        ResponseEntity<?> response = planController.updatePlan(planId, null, principal);
+        ResponseEntity<?> response = planController.updatePlan(planId, request, principal);
 
         // then
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -158,12 +179,19 @@ class PlanControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /api/plans/{id} - 존재하지 않는 플랜 수정 시 404 반환")
+    @DisplayName("PATCH /api/plans/{id} - 존재하지 않는 플랜 수정 시 404 반환")
     void updatePlan_NotFound() throws Exception {
         // given
         Long userId = 1L;
         Long planId = 999L;
         UserDetail principal = createUserDetail(userId);
+
+        var request = new com.ssafy.sulmap.api.dto.request.UpdatePlanRequest(
+                "플랜 제목",
+                null,
+                null,
+                null,
+                null);
 
         @SuppressWarnings("unchecked")
         Result<DrinkingPlanModel> result = (Result<DrinkingPlanModel>) mock(Result.class);
@@ -175,7 +203,7 @@ class PlanControllerTest {
         when(_planService.updatePlan(any(UpdatePlanCommand.class))).thenReturn(result);
 
         // when
-        ResponseEntity<?> response = planController.updatePlan(planId, null, principal);
+        ResponseEntity<?> response = planController.updatePlan(planId, request, principal);
 
         // then
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -183,12 +211,19 @@ class PlanControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /api/plans/{id} - 권한 없는 사용자가 수정 시 403 반환")
+    @DisplayName("PATCH /api/plans/{id} - 권한 없는 사용자가 수정 시 403 반환")
     void updatePlan_Unauthorized() throws Exception {
         // given
         Long userId = 2L; // 다른 사용자
         Long planId = 10L;
         UserDetail principal = createUserDetail(userId);
+
+        var request = new com.ssafy.sulmap.api.dto.request.UpdatePlanRequest(
+                "플랜 제목",
+                null,
+                null,
+                null,
+                null);
 
         @SuppressWarnings("unchecked")
         Result<DrinkingPlanModel> result = (Result<DrinkingPlanModel>) mock(Result.class);
@@ -200,7 +235,7 @@ class PlanControllerTest {
         when(_planService.updatePlan(any(UpdatePlanCommand.class))).thenReturn(result);
 
         // when
-        ResponseEntity<?> response = planController.updatePlan(planId, null, principal);
+        ResponseEntity<?> response = planController.updatePlan(planId, request, principal);
 
         // then
         assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());

@@ -142,8 +142,11 @@ public class ScheduleController {
             @AuthenticationPrincipal UserDetail userDetail) {
         var userId = userDetail.userModel().getId();
 
-        // deleteSchedule은 아직 구현되지 않았으므로 임시로 비워둠
-        // CORE 레이어에 deleteSchedule 메서드가 필요함 (Follow-up)
+        var result = _scheduleService.deleteSchedule(scheduleId, userId);
+        if (result.isFailure()) {
+            return new ResponseEntity<>(result.getSingleErrorOrThrow().getStatus());
+        }
+
         return ResponseEntity.ok().build();
     }
 }

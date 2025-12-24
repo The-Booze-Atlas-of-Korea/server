@@ -58,6 +58,11 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                 .map(DrinkingScheduleEntity::toModel)
                 .toList();
     }
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        _scheduleMapper.deleteById(id);
+    }
 
     /**
      * 신규 일정 삽입

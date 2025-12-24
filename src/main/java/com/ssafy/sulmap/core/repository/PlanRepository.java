@@ -12,4 +12,5 @@ public interface PlanRepository {
     List<DrinkingPlanModel> findByOwnerUserId(Long ownerUserId);
 
     void delete(Long id);
+    List<DrinkingPlanModel> findByOwnerUserId(Long ownerUserId, int offset, int limit, String sort);
 }
