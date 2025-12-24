@@ -10,6 +10,7 @@ import com.ssafy.sulmap.infra.external.openai.GptMinorRecommendClient;
 import com.ssafy.sulmap.infra.external.openai.GptRecommendClient;
 import com.ssafy.sulmap.infra.utils.GptBatchTextBuilder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.time.ZoneId;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class AiRecommendRepositoryImpl implements AiRecommendRepository {
 
     private static final ZoneId ZONE = ZoneId.of("Asia/Seoul");
@@ -48,6 +50,7 @@ public class AiRecommendRepositoryImpl implements AiRecommendRepository {
             var out = _gptMinorRecommendClient.rank(topK, ctx, batch); // { selected: [id,...] }
             selectedIds = (out == null || out.selected == null) ? List.of() : out.selected;
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             // AI 실패 폴백: 입력 순서대로 topK
             selectedIds = models.stream()
                     .map(BarListItemModel::getId)
@@ -107,6 +110,7 @@ public class AiRecommendRepositoryImpl implements AiRecommendRepository {
             var out = _gptRecommendClient.rankTop(topK, ctx, pool); // { top: [{barId, reasons[]}, ...] }
             picked = (out == null || out.top == null) ? List.of() : out.top;
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             // AI 실패 폴백: 입력 순서대로 topK
             List<RecommendedBarModel> fallback = new ArrayList<>();
             int rank = 1;
