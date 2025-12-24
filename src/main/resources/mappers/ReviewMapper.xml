@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.sulmap.infra.mapper.ReviewMapper">
+
+    <!-- ResultMap: Review -->
+    <resultMap id="ReviewResultMap" type="com.ssafy.sulmap.infra.model.ReviewEntity">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="barId" column="bar_id"/>
+        <result property="visitId" column="visit_id"/>
+        <result property="rating" column="rating"/>
+        <result property="content" column="content"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="deletedAt" column="deleted_at"/>
+    </resultMap>
+
+    <!-- ResultMap: ReviewMedia -->
+    <resultMap id="ReviewMediaResultMap" type="com.ssafy.sulmap.infra.model.ReviewMediaEntity">
+        <id property="id" column="id"/>
+        <result property="reviewId" column="review_id"/>
+        <result property="mediaType" column="media_type"/>
+        <result property="url" column="url"/>
+        <result property="orderIndex" column="order_index"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- ResultMap: ReviewReport -->
+    <resultMap id="ReviewReportResultMap" type="com.ssafy.sulmap.infra.model.ReviewReportEntity">
+        <id property="id" column="id"/>
+        <result property="reviewId" column="review_id"/>
+        <result property="reporterId" column="reporter_id"/>
+        <result property="reason" column="reason"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+    </resultMap>
+
+    <!-- BaseColumns -->
+    <sql id="BaseColumns">
+        id, user_id, bar_id, visit_id, rating, content, created_at, updated_at, deleted_at
+    </sql>
+
+    <!-- ***** 리뷰 기본 CRUD ***** -->
+    
+    <!-- INSERT Review -->
+    <insert id="insertReview"
+            parameterType="com.ssafy.sulmap.infra.model.ReviewEntity"
+            useGeneratedKeys="true"
+            keyProperty="id"
+            keyColumn="id">
+        INSERT INTO reviews (user_id, bar_id, visit_id, rating, content, created_at, updated_at, deleted_at)
+        VALUES (#{userId}, #{barId}, #{visitId}, #{rating}, #{content}, NOW(), NOW(), null)
+    </insert>
+
+    <!-- UPDATE Review -->
+    <update id="updateReview" parameterType="com.ssafy.sulmap.infra.model.ReviewEntity">
+        UPDATE reviews
+        <set>
+            <if test="rating != null">rating = #{rating},</if>
+            <if test="content != null">content = #{content},</if>
+            updated_at = NOW()
+        </set>
+        WHERE id = #{id}
+        AND deleted_at IS NULL
+    </update>
+
+    <!-- SELECT by ID -->
+    <select id="selectById"
+            parameterType="long"
+            resultMap="ReviewResultMap">
+        SELECT
+        <include refid="BaseColumns"/>
+        FROM reviews
+        WHERE id = #{id}
+        AND deleted_at IS NULL
+    </select>
+
+    <!-- SELECT by Bar ID with sorting and paging -->
+    <select id="selectByBarId" resultMap="ReviewResultMap">
+        SELECT
+        <include refid="BaseColumns"/>
+        FROM reviews
+        WHERE bar_id = #{barId}
+        AND deleted_at IS NULL
+        <choose>
+            <when test="sort == 'LATEST'">
+                ORDER BY created_at DESC
+            </when>
+            <otherwise>
+                ORDER BY created_at DESC
+            </otherwise>
+        </choose>
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- SELECT by User ID with paging -->
+    <select id="selectByUserId" resultMap="ReviewResultMap">
+        SELECT
+        <include refid="BaseColumns"/>
+        FROM reviews
+        WHERE user_id = #{userId}
+        AND deleted_at IS NULL
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- Soft DELETE -->
+    <update id="softDeleteReview">
+        UPDATE reviews
+        SET deleted_at = NOW()
+        WHERE id = #{id}
+        AND deleted_at IS NULL
+    </update>
+
+    <!-- ***** 리뷰 미디어 ***** -->
+    
+    <!-- INSERT Review Media -->
+    <insert id="insertReviewMedia"
+            parameterType="com.ssafy.sulmap.infra.model.ReviewMediaEntity"
+            useGeneratedKeys="true"
+            keyProperty="id"
+            keyColumn="id">
+        INSERT INTO review_media (review_id, media_type, url, order_index, created_at, updated_at)
+        VALUES (#{reviewId}, #{mediaType}, #{url}, #{orderIndex}, NOW(), NOW())
+    </insert>
+
+    <!-- SELECT Media by Review ID -->
+    <select id="selectMediaByReviewId" resultMap="ReviewMediaResultMap">
+        SELECT id, review_id, media_type, url, order_index, created_at, updated_at
+        FROM review_media
+        WHERE review_id = #{reviewId}
+        ORDER BY order_index ASC
+    </select>
+
+    <!-- DELETE Media by Review ID -->
+    <delete id="deleteMediaByReviewId">
+        DELETE FROM review_media
+        WHERE review_id = #{reviewId}
+    </delete>
+
+    <!-- ***** 리뷰 요약 통계 ***** -->
+    
+    <!-- COUNT by Bar ID -->
+    <select id="countByBarId" resultType="long">
+        SELECT COUNT(*)
+        FROM reviews
+        WHERE bar_id = #{barId}
+        AND deleted_at IS NULL
+    </select>
+
+    <!-- AVERAGE Rating by Bar ID -->
+    <select id="averageRatingByBarId" resultType="double">
+        SELECT IFNULL(AVG(rating), 0.0)
+        FROM reviews
+        WHERE bar_id = #{barId}
+        AND deleted_at IS NULL
+    </select>
+
+    <!-- Rating Distribution by Bar ID -->
+    <select id="ratingDistributionByBarId" resultType="map">
+        SELECT rating, COUNT(*) as count
+        FROM reviews
+        WHERE bar_id = #{barId}
+        AND deleted_at IS NULL
+        GROUP BY rating
+    </select>
+
+    <!-- ***** 리뷰 신고 ***** -->
+    
+    <!-- INSERT Review Report -->
+    <insert id="insertReviewReport"
+            parameterType="com.ssafy.sulmap.infra.model.ReviewReportEntity"
+            useGeneratedKeys="true"
+            keyProperty="id"
+            keyColumn="id">
+        INSERT INTO review_reports (review_id, reporter_id, reason, status, created_at, updated_at)
+        VALUES (#{reviewId}, #{reporterId}, #{reason}, #{status}, NOW(), NOW())
+    </insert>
+
+</mapper>
