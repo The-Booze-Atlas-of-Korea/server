@@ -27,9 +27,9 @@ public class AiRecommendServiceImpl implements AIRecommendService {
     @Override
     public Result<List<RecommendedBarModel>> getRecommendedBars(GetRecommenedBarsQuery query) {
         final int FETCH_CANDIDATES = 200;
-        final int STAGE2_MAX = 50;
-        final int BATCH_SIZE = 20;
-        final int STAGE1_PICK = 5;
+        final int STAGE2_MAX = 40;
+        final int BATCH_SIZE = 100;
+        final int STAGE1_PICK = 20;
         final int FINAL_TOPK = 10;
 
         var findBarsResult = _barService.findNearbyBars(

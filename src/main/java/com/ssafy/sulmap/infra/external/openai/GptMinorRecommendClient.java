@@ -15,9 +15,8 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class GptMinorRecommendClient {
 
-    private static final String MODEL = "gpt-5-nano";
-    private static final double TEMPERATURE = 0.2;
-    private static final long MAX_OUTPUT_TOKENS = 120;
+    private static final String MODEL = "gpt-5.2";
+    private static final long MAX_OUTPUT_TOKENS = 5000;
 
     // batch 라인 포맷: "B|id=123|..."
     private static final Pattern BATCH_ID_PATTERN = Pattern.compile("(?m)^B\\|id=(\\d+)\\b");
@@ -43,8 +42,7 @@ public class GptMinorRecommendClient {
                 .model(MODEL)
                 .instructions(systemInstructions())
                 .input(input)
-                .temperature(TEMPERATURE)
-                .maxOutputTokens(MAX_OUTPUT_TOKENS)
+     //           .maxOutputTokens(MAX_OUTPUT_TOKENS)
                 .text(MinorRankerOutput.class)
                 .build();
 

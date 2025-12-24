@@ -15,8 +15,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class GptRecommendClient {
 
-    private static final String MODEL = "gpt-5-mini";
-    private static final double TEMPERATURE = 0.3;
+    private static final String MODEL = "gpt-5.2";
     private static final long MAX_OUTPUT_TOKENS = 800;
 
     // pool 라인 포맷: "B|id=123|..."
@@ -47,8 +46,7 @@ public class GptRecommendClient {
                 .model(MODEL)
                 .instructions(systemInstructions())
                 .input(input)
-                .temperature(TEMPERATURE)
-                .maxOutputTokens(MAX_OUTPUT_TOKENS)
+//                .maxOutputTokens(MAX_OUTPUT_TOKENS)
                 .text(RecommendOutput.class)
                 .build();
 
