@@ -37,3 +37,5 @@ logs/
 MERGE_RESOLUTION_REPORT.md
 mvnw.cmd
 mvnw.*
+logs/app.log
+mvnw
