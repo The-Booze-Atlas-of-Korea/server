@@ -33,6 +33,8 @@ public class BarSearchElasticEntity {
                 .name(this.getName())
                 .latitude(this.getLatitude())
                 .longitude(this.getLongitude())
+                .menuJsonString(this.getMenuJsonString())
+                .distanceMeters(this.getDistanceMeters())
                 .baseCategoryName(this.getBaseCategoryName())
                 .openInformation(this.getOpenInfo())
                 .createdAt(this.getCreatedAt())

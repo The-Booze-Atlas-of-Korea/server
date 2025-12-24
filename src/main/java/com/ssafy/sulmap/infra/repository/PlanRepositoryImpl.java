@@ -64,7 +64,7 @@ public class PlanRepositoryImpl implements PlanRepository {
 
     @Override
     public List<DrinkingPlanModel> findByOwnerUserId(Long ownerUserId, int offset, int limit, String sort) {
-        var entities = _planMapper.selectByOwnerUserId(ownerUserId, offset, limit, sort);
+        var entities = _planMapper.selectByOwnerUserIdWithPaging(ownerUserId, offset, limit, sort);
 
         return entities.stream().map(entity -> {
             var planId = entity.getId();

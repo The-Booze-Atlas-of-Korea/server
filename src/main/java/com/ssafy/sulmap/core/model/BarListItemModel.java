@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Date;
 import java.util.List;
 
 @Data
-@Builder
+@SuperBuilder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class BarListItemModel {
@@ -18,6 +19,8 @@ public class BarListItemModel {
     private String address;
     private Double latitude;
     private Double longitude;
+    private Double distanceMeters;
+    private String menuJsonString;
     private String baseCategoryName;
     private String openInformation;
     private Date createdAt;

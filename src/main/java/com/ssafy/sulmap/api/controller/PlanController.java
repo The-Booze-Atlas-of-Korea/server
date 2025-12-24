@@ -58,28 +58,9 @@ public class PlanController {
     }
 
     /**
-     * 플랜 목록 조회 (사용자별)
-     */
-    @GetMapping
-    public ResponseEntity<?> listPlans(@AuthenticationPrincipal UserDetail userDetail) {
-        var userId = userDetail.userModel().getId();
-
-        var result = _planService.listPlans(userId);
-        if (result.isFailure()) {
-            return new ResponseEntity<>(result.getSingleErrorOrThrow().getStatus());
-        }
-
-        var plans = result.getOrThrow().stream()
-                .map(PlanListResponse::fromModel)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(plans);
-    }
-
-    /**
      * 플랜 수정
      */
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updatePlan(
             @PathVariable("id") Long planId,
             @Valid @RequestBody UpdatePlanRequest request,
