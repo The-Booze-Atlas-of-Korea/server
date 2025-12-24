@@ -33,3 +33,7 @@ build/
 .vscode/
 .DS_Store
 logs/
+
+MERGE_RESOLUTION_REPORT.md
+mvnw.cmd
+mvnw.*
