@@ -1,6 +1,5 @@
 package com.ssafy.sulmap.infra.model;
 
-import com.ssafy.sulmap.core.model.enums.PlanTheme;
 import com.ssafy.sulmap.core.model.DrinkingPlanModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +34,7 @@ public class DrinkingPlanEntity {
                 .ownerUserId(model.getOwnerUserId())
                 .title(model.getTitle())
                 .description(model.getDescription())
-                .theme(model.getTheme() != null ? model.getTheme().name() : null)
+                .theme(model.getTheme())
                 .totalBudget(model.getTotalBudget())
                 .createdAt(model.getCreatedAt())
                 .updatedAt(model.getUpdatedAt())
@@ -50,13 +50,15 @@ public class DrinkingPlanEntity {
                 .ownerUserId(this.ownerUserId)
                 .title(this.title)
                 .description(this.description)
-                .theme(this.theme != null ? PlanTheme.fromString(this.theme) : null)
+                .theme(this.theme)
                 .totalBudget(this.totalBudget)
                 .createdAt(this.createdAt)
                 .updatedAt(this.updatedAt)
-                .spots(spots != null ? spots.stream()
-                        .map(DrinkingPlanSpotEntity::toModel)
-                        .collect(Collectors.toList()) : null)
+                .spots(spots != null && !spots.isEmpty()
+                        ? new ArrayList<>(spots.stream()
+                                .map(DrinkingPlanSpotEntity::toModel)
+                                .collect(Collectors.toList()))
+                        : new ArrayList<>())
                 .build();
     }
 }

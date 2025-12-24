@@ -51,6 +51,14 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<DrinkingScheduleModel> findByOwnerUserIdPaged(Long userId, int offset, int limit) {
+        List<DrinkingScheduleEntity> entities = _scheduleMapper.selectByOwnerUserIdPaged(userId, offset, limit);
+        return entities.stream()
+                .map(DrinkingScheduleEntity::toModel)
+                .toList();
+    }
+    @Override
     @Transactional
     public void delete(Long id) {
         _scheduleMapper.deleteById(id);

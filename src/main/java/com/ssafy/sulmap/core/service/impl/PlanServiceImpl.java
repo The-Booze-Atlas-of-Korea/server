@@ -9,8 +9,11 @@ import com.ssafy.sulmap.share.result.Result;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +31,7 @@ public class PlanServiceImpl implements PlanService {
                 .totalBudget(command.totalBudget())
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
-                .spots(command.spots())
+                .spots(new ArrayList<>(command.spots()))
                 .build();
 
         DrinkingPlanModel savedPlan = _planRepository.save(plan);
@@ -44,9 +47,17 @@ public class PlanServiceImpl implements PlanService {
                         return Result.<DrinkingPlanModel>fail(403, "플랜 수정 권한이 없습니다");
                     }
 
-                    // 플랜 업데이트
-                    plan.update(command.title(), command.description(), command.theme(), command.totalBudget());
-                    plan.setSpots(command.spots());
+                    // 플랜 업데이트 (null = no change)
+                    plan.update(
+                            command.title() != null ? command.title() : plan.getTitle(),
+                            command.description() != null ? command.description() : plan.getDescription(),
+                            command.theme() != null ? command.theme() : plan.getTheme(),
+                            command.totalBudget() != null ? command.totalBudget() : plan.getTotalBudget());
+
+                    // spots: null = no change, non-null = sync (delete+insert in Repo)
+                    if (command.spots() != null) {
+                        plan.setSpots(new ArrayList<>(command.spots()));
+                    }
 
                     DrinkingPlanModel updatedPlan = _planRepository.save(plan);
                     return Result.ok(updatedPlan);
@@ -62,6 +73,13 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    public Result<List<DrinkingPlanModel>> listPlans(Long userId) {
+        List<DrinkingPlanModel> plans = _planRepository.findByOwnerUserId(userId);
+        return Result.ok(plans);
+    }
+
+    @Override
+    @Transactional
     public Result<List<DrinkingPlanModel>> listPlans(Long ownerUserId, int page, int size, String sort) {
         // 파라미터 방어
         if (ownerUserId == null)
@@ -110,6 +128,7 @@ public class PlanServiceImpl implements PlanService {
                         return Result.<Void>fail(403, "플랜 삭제 권한이 없습니다");
                     }
 
+                    // 플랜 삭제 (spots도 자동 삭제됨)
                     _planRepository.delete(planId);
                     return Result.<Void>ok(null);
                 })

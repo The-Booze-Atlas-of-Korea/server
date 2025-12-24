@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/schedules")
+@RequestMapping("/schedules")
 @RequiredArgsConstructor
 public class ScheduleController {
     private final ScheduleService _scheduleService;
@@ -52,7 +52,7 @@ public class ScheduleController {
     /**
      * 일정 수정
      */
-    @PutMapping("/{id}")
+    @PutMapping("/{id:\\d+}")
     public ResponseEntity<?> updateSchedule(
             @PathVariable("id") Long scheduleId,
             @Valid @RequestBody UpdateScheduleRequest request,
@@ -78,7 +78,7 @@ public class ScheduleController {
     /**
      * 일정 단건 조회
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{id:\\d+}")
     public ResponseEntity<?> getSchedule(@PathVariable("id") Long scheduleId) {
         var result = _scheduleService.getSchedule(scheduleId);
         if (result.isFailure()) {
@@ -86,6 +86,28 @@ public class ScheduleController {
         }
 
         return ResponseEntity.ok(ScheduleResponse.fromModel(result.getOrThrow()));
+    }
+
+    /**
+     * 일정 히스토리 조회 (페이징)
+     */
+    @GetMapping("/history")
+    public ResponseEntity<?> getScheduleHistory(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @AuthenticationPrincipal UserDetail userDetail) {
+        var userId = userDetail.userModel().getId();
+
+        var result = _scheduleService.getScheduleHistory(userId, page, size);
+        if (result.isFailure()) {
+            return ResponseEntity.status(result.getSingleErrorOrThrow().getStatus()).build();
+        }
+
+        var schedules = result.getOrThrow().stream()
+                .map(ScheduleResponse::fromModel)
+                .toList();
+
+        return ResponseEntity.ok(schedules);
     }
 
     /**
@@ -101,7 +123,7 @@ public class ScheduleController {
         var query = new GetSchedulesInPeriodQuery(userId, from, to);
         var result = _scheduleService.getSchedulesInPeriod(query);
         if (result.isFailure()) {
-            return new ResponseEntity<>(result.getSingleErrorOrThrow().getStatus());
+            return ResponseEntity.status(result.getSingleErrorOrThrow().getStatus()).build();
         }
 
         var schedules = result.getOrThrow().stream()
@@ -114,7 +136,7 @@ public class ScheduleController {
     /**
      * 일정 삭제
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id:\\d+}")
     public ResponseEntity<?> deleteSchedule(
             @PathVariable("id") Long scheduleId,
             @AuthenticationPrincipal UserDetail userDetail) {

@@ -17,5 +17,7 @@ public interface ScheduleService {
 
     Result<List<DrinkingScheduleModel>> getSchedulesInPeriod(GetSchedulesInPeriodQuery query);
 
+    Result<List<DrinkingScheduleModel>> getScheduleHistory(Long userId, int page, int size);
+  
     Result<Void> deleteSchedule(Long scheduleId, Long userId);
 }

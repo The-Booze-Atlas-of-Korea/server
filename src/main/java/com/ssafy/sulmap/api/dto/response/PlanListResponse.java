@@ -7,35 +7,34 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
+/**
+ * 플랜 목록 조회용 응답 DTO (요약 정보)
+ * GET /api/plans 전용
+ * spots 필드 없음 - 상세 조회는 PlanResponse 사용
+ */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlanResponse {
+public class PlanListResponse {
     private Long id;
     private Long ownerUserId;
     private String title;
     private String description;
     private String theme;
     private Long totalBudget;
-    private List<PlanSpotResponse> spots;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public static PlanResponse fromModel(DrinkingPlanModel model) {
-        return PlanResponse.builder()
+    public static PlanListResponse fromModel(DrinkingPlanModel model) {
+        return PlanListResponse.builder()
                 .id(model.getId())
                 .ownerUserId(model.getOwnerUserId())
                 .title(model.getTitle())
                 .description(model.getDescription())
                 .theme(model.getTheme())
                 .totalBudget(model.getTotalBudget())
-                .spots(model.getSpots() != null ? model.getSpots().stream()
-                        .map(PlanSpotResponse::fromModel)
-                        .collect(Collectors.toList()) : null)
                 .createdAt(model.getCreatedAt())
                 .updatedAt(model.getUpdatedAt())
                 .build();

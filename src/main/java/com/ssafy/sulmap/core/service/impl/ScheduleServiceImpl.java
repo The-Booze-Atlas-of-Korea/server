@@ -74,6 +74,20 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
+    public Result<List<DrinkingScheduleModel>> getScheduleHistory(Long userId, int page, int size) {
+        // 파라미터 검증
+        if (page < 0) {
+            return Result.fail(400, "페이지 번호는 0 이상이어야 합니다");
+        }
+        if (size <= 0 || size > 100) {
+            return Result.fail(400, "페이지 크기는 1~100 사이여야 합니다");
+        }
+
+        int offset = page * size;
+        List<DrinkingScheduleModel> schedules = _scheduleRepository.findByOwnerUserIdPaged(userId, offset, size);
+        return Result.ok(schedules);
+    }
+  
     public Result<Void> deleteSchedule(Long scheduleId, Long userId) {
         return _scheduleRepository.findById(scheduleId)
                 .map(schedule -> {

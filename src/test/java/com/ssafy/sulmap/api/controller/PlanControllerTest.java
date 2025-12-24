@@ -7,7 +7,6 @@ import com.ssafy.sulmap.core.model.DrinkingPlanSpotModel;
 import com.ssafy.sulmap.core.model.UserModel;
 import com.ssafy.sulmap.core.model.command.CreatePlanCommand;
 import com.ssafy.sulmap.core.model.command.UpdatePlanCommand;
-import com.ssafy.sulmap.core.model.enums.PlanTheme;
 import com.ssafy.sulmap.core.service.PlanService;
 import com.ssafy.sulmap.share.result.Result;
 import com.ssafy.sulmap.share.result.error.impl.NotFoundError;
@@ -89,7 +88,7 @@ class PlanControllerTest {
                 .ownerUserId(userId)
                 .title("연말 회식 플랜")
                 .description("2024 연말 회식")
-                .theme(PlanTheme.COMPANY)
+                .theme("COMPANY")
                 .totalBudget(100000L)
                 .spots(Arrays.asList())
                 .createdAt(LocalDateTime.now())
@@ -161,7 +160,7 @@ class PlanControllerTest {
                 .id(planId)
                 .ownerUserId(userId)
                 .title("수정된 플랜")
-                .theme(PlanTheme.FRIEND)
+                .theme("FRIEND")
                 .build();
 
         @SuppressWarnings("unchecked")
@@ -253,7 +252,7 @@ class PlanControllerTest {
                 .id(planId)
                 .ownerUserId(1L)
                 .title("테스트 플랜")
-                .theme(PlanTheme.FRIEND)
+                .theme("FRIEND")
                 .build();
 
         @SuppressWarnings("unchecked")

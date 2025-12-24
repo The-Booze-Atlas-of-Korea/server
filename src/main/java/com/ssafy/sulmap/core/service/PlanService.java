@@ -6,6 +6,8 @@ import com.ssafy.sulmap.core.model.command.UpdatePlanCommand;
 import com.ssafy.sulmap.share.result.Result;
 import java.util.List;
 
+import java.util.List;
+
 public interface PlanService {
     Result<DrinkingPlanModel> createPlan(CreatePlanCommand command);
 

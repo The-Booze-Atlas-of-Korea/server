@@ -44,6 +44,16 @@ public class PlanRepositoryImpl implements PlanRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<DrinkingPlanModel> findByOwnerUserId(Long ownerUserId) {
+        List<DrinkingPlanEntity> entities = _planMapper.selectByOwnerUserId(ownerUserId);
+        // spots 없는 목록 반환 - N+1 방지
+        return entities.stream()
+                .map(entity -> entity.toModel(List.of())) // 빈 spots 리스트
+                .toList();
+    }
+
+    @Override
     @Transactional
     public void delete(Long id) {
         // 플랜에 속한 스팟 먼저 삭제

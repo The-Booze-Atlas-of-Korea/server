@@ -28,6 +28,14 @@ public interface ScheduleMapper {
             @Param("endDate") LocalDateTime endDate);
 
     /**
+     * 사용자별 일정 페이징 조회 (히스토리용)
+     */
+    List<DrinkingScheduleEntity> selectByOwnerUserIdPaged(
+            @Param("ownerUserId") Long ownerUserId,
+            @Param("offset") int offset,
+            @Param("limit") int limit);
+
+    /**
      * 일정 수정
      */
     int update(DrinkingScheduleEntity entity);
