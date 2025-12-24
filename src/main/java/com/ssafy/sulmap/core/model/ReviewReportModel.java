@@ -1,5 +1,6 @@
 package com.ssafy.sulmap.core.model;
 
+import com.ssafy.sulmap.core.model.enums.ReportStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,17 +8,17 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
- * 개인 메모 도메인 모델
+ * 리뷰 신고 도메인 모델
  */
 @Getter
 @Setter
 @Builder
-public class MemoModel {
+public class ReviewReportModel {
     private Long id;
-    private Long userId;
-    private Long barId;
-    private String content;
+    private Long reviewId;
+    private Long reporterId;
+    private String reason;
+    private ReportStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private LocalDateTime deletedAt;
 }
