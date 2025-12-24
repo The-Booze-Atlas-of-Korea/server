@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/ai")
+@RequestMapping("/ai")
 public class AIRecommendController {
 
     private final AIRecommendService aiRecommendService;
