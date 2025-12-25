@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
  * 메모 컨트롤러
  */
 @RestController
-@RequestMapping("/api/bars/{barId}/memo")
+@RequestMapping("/bars/{barId}/memo")
 @RequiredArgsConstructor
 public class MemoController {
     private final MemoService _memoService;

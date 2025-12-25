@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * 리뷰 컨트롤러
  */
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/bars/{barId}/reviews")
 @RequiredArgsConstructor
 public class ReviewController {
     private final ReviewService _reviewService;
@@ -32,7 +32,7 @@ public class ReviewController {
     /**
      * 술집의 리뷰 요약 통계 조회
      */
-    @GetMapping("/bars/{barId}/reviews/summary")
+    @GetMapping("/summary")
     public ResponseEntity<?> getReviewSummary(@PathVariable Long barId) {
         var result = _reviewService.getSummary(barId);
 
@@ -46,7 +46,7 @@ public class ReviewController {
     /**
      * 술집의 리뷰 목록 조회
      */
-    @GetMapping("/bars/{barId}/reviews")
+    @GetMapping
     public ResponseEntity<?> listReviews(
             @PathVariable Long barId,
             @RequestParam(defaultValue = "LATEST") String sort,
@@ -83,7 +83,7 @@ public class ReviewController {
     /**
      * 리뷰 생성
      */
-    @PostMapping("/bars/{barId}/reviews")
+    @PostMapping
     public ResponseEntity<?> createReview(
             @PathVariable Long barId,
             @Valid @RequestBody CreateReviewRequest request,
